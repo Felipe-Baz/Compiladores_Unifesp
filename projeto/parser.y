@@ -155,6 +155,18 @@ statement:
     | iteration_stmt
     | return_stmt
     | io_stmt
+    | call_stmt  /* NOVO: chamada de função como statement */
+    ;
+
+/* NOVO: Chamada de função como statement (sem uso do retorno) */
+call_stmt:
+      ID LPAREN args RPAREN SEMI {
+          int idx = busca($1, escopo_atual);
+          if (idx == -1) {
+              printf("Erro semantico: funcao '%s' nao declarada.\n", $1);
+          }
+          /* NÃO verifica tipo void aqui - é permitido chamar função void como statement */
+      }
     ;
 
 /* Novos statements de I/O */
@@ -231,18 +243,27 @@ factor:
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+          } else if (strcmp(tabela[idx].tipo, "void") == 0) {
+              printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
           }
     }
     | ID LPAREN args RPAREN {
+          /* CHAMADA DE FUNÇÃO DENTRO DE EXPRESSÃO - retorno é usado */
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: funcao '%s' nao declarada.\n", $1);
+          } else if (strcmp(tabela[idx].tipo, "void") == 0) {
+              printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
           }
     }
     | ID LBRACKET expression RBRACKET {
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+          }
+
+          if (strcmp(tabela[idx].tipo, "void") == 0) {
+              printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
           }
     }
     | NUM
