@@ -7,9 +7,7 @@
 
 FILE *out;
 
-
-/* Macros para atualizar a localização */
-#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno; \
+#define YY_USER_ACTION yylloc.first_line = yylineno; \
                        
 %}
 

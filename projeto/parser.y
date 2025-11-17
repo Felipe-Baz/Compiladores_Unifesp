@@ -114,8 +114,12 @@ param_list:
     ;
 
 param:
-      type_specifier ID
-    | type_specifier ID LBRACKET RBRACKET
+      type_specifier ID {
+          insere($2, $1, @2.first_line, escopo_atual);
+      }
+    | type_specifier ID LBRACKET RBRACKET {
+          insere($2, $1, @2.first_line, escopo_atual);
+      }
     ;
 
 type_specifier:
