@@ -6,7 +6,15 @@
 #include "parser.tab.h" 
 
 FILE *out;
+
+
+/* Macros para atualizar a localização */
+#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno; \
+                       
 %}
+
+%option yylineno
+%option noyywrap
 
 %x COMMENT
 
@@ -17,7 +25,8 @@ FILE *out;
 
 <COMMENT>{
     "*/"                  { BEGIN(INITIAL); }
-    .|\n                  { /* ignora tudo dentro do comentario */ }
+    \n                    { }   /* reseta coluna em nova linha */
+    .                     { /* ignora */ }
 }
 
 "if"                      { fprintf(out, "[IF] "); return IF; }
@@ -57,8 +66,6 @@ FILE *out;
 \n                        { fprintf(out, "\n"); }
 [ \t\r]                   { /* ignora espaços e tabs */ }
 
-.                         { fprintf(out, "[UNK:%s] ", yytext); }
+.                         { fprintf(out, "[UNK:%s] "); return yytext[0]; }
 
 %%
-
-int yywrap(void) { return 1; }
