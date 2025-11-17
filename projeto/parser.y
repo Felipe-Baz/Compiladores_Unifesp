@@ -7,11 +7,49 @@ extern FILE *yyin;
 extern FILE *out;
 extern int yylex();
 void yyerror(const char *s);
+
+typedef struct {
+    char* nome;
+    char* tipo;
+    int linha;
+    char* scope;
+} Simbolo;
+
+Simbolo tabela[100];
+int n_simbolos = 0;
+char* escopo_atual = "global";
+
+
+//int busca(char* nome, char* scope) {
+//    for (int i = 0; i < n_simbolos; i++) {
+//        if (strcmp(tabela[i].nome, nome) == 0)
+//            return i;
+//    }
+//    return -1;
+//}
+
+void insere(char* nome, char* tipo, int linha, char* scope) {
+  //  if (busca(nome) != -1) {
+  //      printf("Erro semântico: variável '%s' já declarada.\n", nome);
+  //      return;
+  //  }
+    printf("Foi inserido o %s com tipo %s, linha: %d, escopo: %s\n", nome, tipo, linha, scope);
+
+    tabela[n_simbolos].nome = strdup(nome);
+    tabela[n_simbolos].tipo = strdup(tipo);
+    tabela[n_simbolos].scope = strdup(scope);
+    tabela[n_simbolos].linha = linha;
+
+    n_simbolos++;
+}
 %}
+
+%locations
 
 %union {
     int ival;
     char *sval;
+    char *tipo;
 }
 
 /* Tokens */
@@ -21,6 +59,8 @@ void yyerror(const char *s);
 %token SEMI COMMA LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
 %token <sval> ID
 %token <ival> NUM
+
+%type <tipo> type_specifier expression simple_expression additive_expression term factor
 
 %%
 
@@ -40,7 +80,9 @@ declaration:
 
 /* Suporte a arrays na declaração de variáveis */
 var_declaration:
-      type_specifier ID array_spec SEMI
+      type_specifier ID array_spec SEMI {
+          insere($2, $1, @2.first_line, escopo_atual);
+      }
     ;
 
 array_spec:
@@ -68,8 +110,8 @@ param:
     ;
 
 type_specifier:
-      INT
-    | VOID
+      INT  { $$ = "int"; }
+    | VOID { $$ = "void"; }
     ;
 
 compound_stmt:
@@ -168,7 +210,7 @@ arg_list:
 %%
 
 void yyerror(const char *s) {
-    fprintf(out, "\n[ERRO SINTÁTICO]: %s\n", s);
+    printf("\n[ERRO SINTATICO]: %s\n", s);
 }
 
 int main(int argc, char **argv) {
