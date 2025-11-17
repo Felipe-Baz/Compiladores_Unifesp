@@ -91,8 +91,17 @@ array_spec:
     ;
 
 fun_declaration:
-      type_specifier ID LPAREN params RPAREN compound_stmt
+      type_specifier ID LPAREN {
+            insere($2, $1, @2.first_line, escopo_atual);
+
+            escopo_atual = strdup($2);
+      } 
+      params RPAREN 
+      compound_stmt {
+            escopo_atual = "global";
+      }
     ;
+
 
 params:
       param_list
