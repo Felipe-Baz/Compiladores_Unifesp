@@ -20,19 +20,25 @@ int n_simbolos = 0;
 char* escopo_atual = "global";
 
 
-//int busca(char* nome, char* scope) {
-//    for (int i = 0; i < n_simbolos; i++) {
-//        if (strcmp(tabela[i].nome, nome) == 0)
-//            return i;
-//    }
-//    return -1;
-//}
+int busca(char* nome, char* scope) {
+    for (int i = 0; i < n_simbolos; i++) {
+        if (
+          strcmp(tabela[i].nome, nome) == 0 &&
+          (
+            strcmp(tabela[i].scope, scope) == 0 ||
+            strcmp(tabela[i].scope, "global") == 0
+          )
+        )
+            return i;
+    }
+    return -1;
+}
 
 void insere(char* nome, char* tipo, int linha, char* scope) {
-  //  if (busca(nome) != -1) {
-  //      printf("Erro semântico: variável '%s' já declarada.\n", nome);
-  //      return;
-  //  }
+    if (busca(nome, scope) != -1) {
+        printf("Erro semantico: variavel '%s' ja declarada.\n", nome);
+        return;
+    }
     printf("Foi inserido o %s com tipo %s, linha: %d, escopo: %s\n", nome, tipo, linha, scope);
 
     tabela[n_simbolos].nome = strdup(nome);
@@ -54,6 +60,7 @@ void insere(char* nome, char* tipo, int linha, char* scope) {
 
 /* Tokens */
 %token IF ELSE WHILE RETURN INT VOID
+%token OUTPUT INPUT
 %token EQ NEQ LEQ GEQ LT GT ASSIGN
 %token PLUS MINUS TIMES DIVIDE
 %token SEMI COMMA LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
@@ -147,6 +154,12 @@ statement:
     | selection_stmt
     | iteration_stmt
     | return_stmt
+    | io_stmt
+    ;
+
+/* Novos statements de I/O */
+io_stmt:
+      OUTPUT LPAREN expression RPAREN SEMI
     ;
 
 expression_stmt:
@@ -170,8 +183,18 @@ return_stmt:
 
 /* Suporte a elementos de array no lado esquerdo da atribuição */
 expression:
-      ID ASSIGN expression
-    | ID LBRACKET expression RBRACKET ASSIGN expression
+      ID ASSIGN expression {
+          int idx = busca($1, escopo_atual);
+          if (idx == -1) {
+              printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+          }
+      }
+    | ID LBRACKET expression RBRACKET ASSIGN expression {
+          int idx = busca($1, escopo_atual);
+          if (idx == -1) {
+              printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+          }
+    }
     | simple_expression
     ;
 
@@ -204,10 +227,26 @@ mulop:
 
 factor:
       LPAREN expression RPAREN
-    | ID
-    | ID LPAREN args RPAREN
-    | ID LBRACKET expression RBRACKET  /* acessar elemento de array */
+    | ID {
+          int idx = busca($1, escopo_atual);
+          if (idx == -1) {
+              printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+          }
+    }
+    | ID LPAREN args RPAREN {
+          int idx = busca($1, escopo_atual);
+          if (idx == -1) {
+              printf("Erro semantico: funcao '%s' nao declarada.\n", $1);
+          }
+    }
+    | ID LBRACKET expression RBRACKET {
+          int idx = busca($1, escopo_atual);
+          if (idx == -1) {
+              printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+          }
+    }
     | NUM
+    | INPUT LPAREN RPAREN
     ;
 
 args:

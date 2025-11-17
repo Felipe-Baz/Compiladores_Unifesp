@@ -33,8 +33,8 @@ FILE *out;
 "return"                  { fprintf(out, "[RETURN] "); return RETURN; }
 "int"                     { fprintf(out, "[INT] "); return INT; }
 "void"                    { fprintf(out, "[VOID] "); return VOID; }
-"write"                   { fprintf(out, "[WRITE] "); /* token não usado, se quiser adicione no parser */ }
-"read"                    { fprintf(out, "[READ] "); /* idem */ }
+"output"                  { fprintf(out, "[OUTPUT] "); return OUTPUT; }
+"input"                   { fprintf(out, "[INPUT] "); return INPUT; }
 
 [0-9]+                    { fprintf(out, "[NUM:%s] ", yytext); yylval.ival = atoi(yytext); return NUM; }
 [a-zA-Z_][a-zA-Z0-9_]*    { fprintf(out, "[ID:%s] ", yytext); yylval.sval = strdup(yytext); return ID; }
