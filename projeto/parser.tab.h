@@ -45,27 +45,29 @@
      RETURN = 261,
      INT = 262,
      VOID = 263,
-     EQ = 264,
-     NEQ = 265,
-     LEQ = 266,
-     GEQ = 267,
-     LT = 268,
-     GT = 269,
-     ASSIGN = 270,
-     PLUS = 271,
-     MINUS = 272,
-     TIMES = 273,
-     DIVIDE = 274,
-     SEMI = 275,
-     COMMA = 276,
-     LPAREN = 277,
-     RPAREN = 278,
-     LBRACE = 279,
-     RBRACE = 280,
-     LBRACKET = 281,
-     RBRACKET = 282,
-     ID = 283,
-     NUM = 284
+     OUTPUT = 264,
+     INPUT = 265,
+     EQ = 266,
+     NEQ = 267,
+     LEQ = 268,
+     GEQ = 269,
+     LT = 270,
+     GT = 271,
+     ASSIGN = 272,
+     PLUS = 273,
+     MINUS = 274,
+     TIMES = 275,
+     DIVIDE = 276,
+     SEMI = 277,
+     COMMA = 278,
+     LPAREN = 279,
+     RPAREN = 280,
+     LBRACE = 281,
+     RBRACE = 282,
+     LBRACKET = 283,
+     RBRACKET = 284,
+     ID = 285,
+     NUM = 286
    };
 #endif
 
@@ -76,15 +78,16 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 12 "parser.y"
+#line 55 "parser.y"
 
     int ival;
     char *sval;
+    char *tipo;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 88 "parser.tab.h"
+#line 91 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -93,4 +96,18 @@ typedef union YYSTYPE
 
 extern YYSTYPE yylval;
 
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+typedef struct YYLTYPE
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+} YYLTYPE;
+# define yyltype YYLTYPE /* obsolescent; will be withdrawn */
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
+#endif
+
+extern YYLTYPE yylloc;
 

@@ -45,6 +45,8 @@ void main(void)
 		output(vet[i]);
 		i = i + 1;
 	}
+	i = func3();
+	func4();
 }
 
 			

@@ -1,0 +1,8 @@
+
+
+[INT] [ID:gcd] [LPAREN] [INT] [ID:u] [COMMA] [INT] [ID:v] [RPAREN] 
+[LBRACE] 
+[IF] [LPAREN] [ID:v] [EQ] [NUM:0] [RPAREN] [RETURN] [ID:u] [SEMI] 
+[ELSE] [RETURN] [ID:gcd] [LPAREN] [ID:v] [COMMA] [ID:u] [MINUS] [ID:u] [DIVIDE] [ID:v] [TIMES] [ID:v] [RPAREN] [SEMI] 
+
+[RBRACE] 

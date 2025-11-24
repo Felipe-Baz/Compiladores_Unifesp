@@ -88,7 +88,16 @@ declaration:
 /* Suporte a arrays na declaração de variáveis */
 var_declaration:
       type_specifier ID array_spec SEMI {
-          insere($2, $1, @2.first_line, escopo_atual);
+        int id = busca($2, escopo_atual);
+        if (id != -1) {
+            printf("Erro semantico: variavel '%s' ja declarada.\n", $2);
+        } else {
+            if (strcmp($1, "void") == 0) {
+                printf("Erro semantico: variavel '%s' nao pode ser do tipo void.\n", $2);
+            } else {
+                insere($2, $1, @2.first_line, escopo_atual);
+            }
+        }
       }
     ;
 
@@ -99,7 +108,13 @@ array_spec:
 
 fun_declaration:
       type_specifier ID LPAREN {
-            insere($2, $1, @2.first_line, escopo_atual);
+            int id = busca($2, escopo_atual);
+
+            if (id != -1) {
+                printf("Erro semantico: funcao '%s' ja declarada.\n", $2);
+            } else {
+                insere($2, $1, @2.first_line, escopo_atual);
+            }
 
             escopo_atual = strdup($2);
       } 
@@ -122,7 +137,16 @@ param_list:
 
 param:
       type_specifier ID {
-          insere($2, $1, @2.first_line, escopo_atual);
+          int id = busca($2, escopo_atual);
+          if (id != -1) {
+              printf("Erro semantico: variavel '%s' ja declarada.\n", $2);
+          } else {
+              if (strcmp($1, "void") == 0) {
+                  printf("Erro semantico: parametro '%s' nao pode ser do tipo void.\n", $2);
+              } else {
+                  insere($2, $1, @2.first_line, escopo_atual);
+              }
+          }
       }
     | type_specifier ID LBRACKET RBRACKET {
           insere($2, $1, @2.first_line, escopo_atual);
