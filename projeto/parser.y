@@ -13,6 +13,7 @@ typedef struct {
     char* tipo;
     int linha;
     char* scope;
+    int param_counter;
 } Simbolo;
 
 Simbolo tabela[100];
@@ -34,7 +35,7 @@ int busca(char* nome, char* scope) {
     return -1;
 }
 
-void insere(char* nome, char* tipo, int linha, char* scope) {
+void insere(char* nome, char* tipo, int linha, char* scope, int param_counter) {
     if (busca(nome, scope) != -1) {
         printf("Erro semantico: variavel '%s' ja declarada.\n", nome);
         return;
@@ -45,6 +46,7 @@ void insere(char* nome, char* tipo, int linha, char* scope) {
     tabela[n_simbolos].tipo = strdup(tipo);
     tabela[n_simbolos].scope = strdup(scope);
     tabela[n_simbolos].linha = linha;
+    tabela[n_simbolos].param_counter = param_counter;
 
     n_simbolos++;
 }
@@ -56,6 +58,7 @@ void insere(char* nome, char* tipo, int linha, char* scope) {
     int ival;
     char *sval;
     char *tipo;
+    int param_count;
 }
 
 /* Tokens */
@@ -68,6 +71,7 @@ void insere(char* nome, char* tipo, int linha, char* scope) {
 %token <ival> NUM
 
 %type <tipo> type_specifier expression simple_expression additive_expression term factor
+%type <param_count> params param_list args arg_list
 
 %%
 
@@ -101,7 +105,7 @@ var_declaration:
             if (strcmp($1, "void") == 0) {
                 printf("Erro semantico: variavel '%s' nao pode ser do tipo void.\n", $2);
             } else {
-                insere($2, $1, @2.first_line, escopo_atual);
+                insere($2, $1, @2.first_line, escopo_atual, 0);
             }
         }
       }
@@ -119,12 +123,18 @@ fun_declaration:
             if (id != -1) {
                 printf("Erro semantico: funcao '%s' ja declarada.\n", $2);
             } else {
-                insere($2, $1, @2.first_line, escopo_atual);
+                insere($2, $1, @2.first_line, escopo_atual, 0);
             }
 
             escopo_atual = strdup($2);
       } 
-      params RPAREN 
+      params {
+            int idx = busca($<sval>2, "global");
+            if (idx != -1) {
+                tabela[idx].param_counter = $5;
+            }
+      } 
+      RPAREN 
       compound_stmt {
             escopo_atual = "global";
       }
@@ -132,13 +142,13 @@ fun_declaration:
 
 
 params:
-      param_list
-    | VOID
+      param_list { $$ = $1; }
+    | VOID { $$ = 0; }
     ;
 
 param_list:
-      param_list COMMA param
-    | param
+      param_list COMMA param { $$ = $1 + 1; }
+    | param { $$ = 1; }
     ;
 
 param:
@@ -150,12 +160,12 @@ param:
               if (strcmp($1, "void") == 0) {
                   printf("Erro semantico: parametro '%s' nao pode ser do tipo void.\n", $2);
               } else {
-                  insere($2, $1, @2.first_line, escopo_atual);
+                  insere($2, $1, @2.first_line, escopo_atual, 0);
               }
           }
       }
     | type_specifier ID LBRACKET RBRACKET {
-          insere($2, $1, @2.first_line, escopo_atual);
+          insere($2, $1, @2.first_line, escopo_atual, 0);
       }
     ;
 
@@ -194,6 +204,11 @@ call_stmt:
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: funcao '%s' nao declarada.\n", $1);
+          } else {
+            if (tabela[idx].param_counter != $3) {
+                  printf("Erro semantico: funcao '%s' espera %d parametro(s), mas recebeu %d argumento(s).\n", 
+                         $1, tabela[idx].param_counter, $3);
+              }
           }
           /* NÃO verifica tipo void aqui - é permitido chamar função void como statement */
       }
@@ -284,6 +299,12 @@ factor:
               printf("Erro semantico: funcao '%s' nao declarada.\n", $1);
           } else if (strcmp(tabela[idx].tipo, "void") == 0) {
               printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
+          } else {
+              // Verifica número de argumentos
+              if (tabela[idx].param_counter != $3) {
+                  printf("Erro semantico: funcao '%s' espera %d parametro(s), mas recebeu %d argumento(s).\n", 
+                         $1, tabela[idx].param_counter, $3);
+              }
           }
     }
     | ID LBRACKET expression RBRACKET {
@@ -301,13 +322,13 @@ factor:
     ;
 
 args:
-      arg_list
-    | /* vazio */
+      arg_list { $$ = $1; }
+    | /* vazio */ { $$ = 0; }
     ;
 
 arg_list:
-      arg_list COMMA expression
-    | expression
+      arg_list COMMA expression { $$ = $1 + 1; }
+    | expression { $$ = 1; }
     ;
 
 %%
