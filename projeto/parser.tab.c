@@ -534,13 +534,13 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    75,    75,    79,    80,    84,    85,    90,   104,   106,
-     110,   110,   129,   130,   134,   135,   139,   151,   157,   158,
-     162,   166,   167,   171,   172,   176,   177,   178,   179,   180,
-     181,   182,   187,   198,   202,   203,   207,   208,   212,   216,
-     217,   222,   228,   234,   238,   239,   243,   243,   243,   243,
-     243,   243,   247,   248,   252,   252,   256,   257,   261,   261,
-     265,   266,   274,   283,   293,   294,   298,   299,   303,   304
+       0,    75,    75,    85,    86,    90,    91,    96,   110,   112,
+     116,   116,   135,   136,   140,   141,   145,   157,   163,   164,
+     168,   172,   173,   177,   178,   182,   183,   184,   185,   186,
+     187,   188,   193,   204,   208,   209,   213,   214,   218,   222,
+     223,   228,   234,   240,   244,   245,   249,   249,   249,   249,
+     249,   249,   253,   254,   258,   258,   262,   263,   267,   267,
+     271,   272,   280,   289,   299,   300,   304,   305,   309,   310
 };
 #endif
 
@@ -1563,13 +1563,19 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 75 "parser.y"
-    { printf("[ANALISE SINTATICA - OK]\n"); ;}
+    { 
+        if(busca("main", "global") == -1) {
+            printf("Erro semantico: funcao 'main' nao declarada.\n");
+        } else {
+            printf("[ANALISE SINTATICA - OK]\n"); 
+        }
+    ;}
     break;
 
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 90 "parser.y"
+#line 96 "parser.y"
     {
         int id = busca((yyvsp[(2) - (4)].sval), escopo_atual);
         if (id != -1) {
@@ -1587,7 +1593,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 110 "parser.y"
+#line 116 "parser.y"
     {
             int id = busca((yyvsp[(2) - (3)].sval), escopo_atual);
 
@@ -1604,7 +1610,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 122 "parser.y"
+#line 128 "parser.y"
     {
             escopo_atual = "global";
       ;}
@@ -1613,7 +1619,7 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 139 "parser.y"
+#line 145 "parser.y"
     {
           int id = busca((yyvsp[(2) - (2)].sval), escopo_atual);
           if (id != -1) {
@@ -1631,7 +1637,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 151 "parser.y"
+#line 157 "parser.y"
     {
           insere((yyvsp[(2) - (4)].sval), (yyvsp[(1) - (4)].tipo), (yylsp[(2) - (4)]).first_line, escopo_atual);
       ;}
@@ -1640,21 +1646,21 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 157 "parser.y"
+#line 163 "parser.y"
     { (yyval.tipo) = "int"; ;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 158 "parser.y"
+#line 164 "parser.y"
     { (yyval.tipo) = "void"; ;}
     break;
 
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 187 "parser.y"
+#line 193 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (5)].sval), escopo_atual);
           if (idx == -1) {
@@ -1667,7 +1673,7 @@ yyreduce:
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 222 "parser.y"
+#line 228 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (3)].sval), escopo_atual);
           if (idx == -1) {
@@ -1679,7 +1685,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 228 "parser.y"
+#line 234 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (6)].sval), escopo_atual);
           if (idx == -1) {
@@ -1691,7 +1697,7 @@ yyreduce:
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 266 "parser.y"
+#line 272 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (1)].sval), escopo_atual);
           if (idx == -1) {
@@ -1705,7 +1711,7 @@ yyreduce:
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 274 "parser.y"
+#line 280 "parser.y"
     {
           /* CHAMADA DE FUNÇÃO DENTRO DE EXPRESSÃO - retorno é usado */
           int idx = busca((yyvsp[(1) - (4)].sval), escopo_atual);
@@ -1720,7 +1726,7 @@ yyreduce:
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 283 "parser.y"
+#line 289 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (4)].sval), escopo_atual);
           if (idx == -1) {
@@ -1736,7 +1742,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1740 "parser.tab.c"
+#line 1746 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1955,7 +1961,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 307 "parser.y"
+#line 313 "parser.y"
 
 
 void yyerror(const char *s) {

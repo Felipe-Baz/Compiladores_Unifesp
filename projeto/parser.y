@@ -72,7 +72,13 @@ void insere(char* nome, char* tipo, int linha, char* scope) {
 %%
 
 program:
-    declaration_list { printf("[ANALISE SINTATICA - OK]\n"); }
+    declaration_list { 
+        if(busca("main", "global") == -1) {
+            printf("Erro semantico: funcao 'main' nao declarada.\n");
+        } else {
+            printf("[ANALISE SINTATICA - OK]\n"); 
+        }
+    }
     ;
 
 declaration_list:
