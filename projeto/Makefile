@@ -12,5 +12,6 @@ test: cminus
 	./cminus exemplo/sort.txt saida_sort.txt
 	./cminus exemplo/gcd.txt saida_gcd.txt
 	./cminus exemplo/withoutmain.txt saida_withoutmain.txt
+	./cminus exemplo/teste.txt saida_teste.txt
 
 .PHONY: all clean test cminus

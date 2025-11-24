@@ -31,6 +31,13 @@
 [ID:i] [ASSIGN] [ID:t] [SEMI] 
 [RBRACE] 
 
+[INT] [ID:xyz] [LPAREN] [VOID] [RPAREN] [LBRACE] 
+[RBRACE] 
+
+[VOID] [ID:xyv] [LPAREN] [VOID] [RPAREN] [LBRACE] 
+[RETURN] [SEMI] 
+[RBRACE] 
+
 [VOID] [ID:main] [LPAREN] [VOID] [RPAREN] 
 [LBRACE] 
 [INT] [ID:i] [SEMI] 
@@ -45,5 +52,7 @@
 [OUTPUT] [LPAREN] [ID:vet] [LBRACKET] [ID:i] [RBRACKET] [RPAREN] [SEMI] 
 [ID:i] [ASSIGN] [ID:i] [PLUS] [NUM:1] [SEMI] 
 [RBRACE] 
+[ID:i] [ASSIGN] [ID:xyz] [LPAREN] [RPAREN] [SEMI] 
+[ID:xyv] [LPAREN] [RPAREN] [SEMI] 
 [RBRACE] 
 

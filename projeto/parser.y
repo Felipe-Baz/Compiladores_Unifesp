@@ -19,6 +19,7 @@ typedef struct {
 Simbolo tabela[100];
 int n_simbolos = 0;
 char* escopo_atual = "global";
+int has_return = 0;
 
 
 int busca(char* nome, char* scope) {
@@ -40,7 +41,7 @@ void insere(char* nome, char* tipo, int linha, char* scope, int param_counter) {
         printf("Erro semantico: variavel '%s' ja declarada.\n", nome);
         return;
     }
-    printf("Foi inserido o %s com tipo %s, linha: %d, escopo: %s\n", nome, tipo, linha, scope);
+    // printf("Foi inserido o %s com tipo %s, linha: %d, escopo: %s\n", nome, tipo, linha, scope);
 
     tabela[n_simbolos].nome = strdup(nome);
     tabela[n_simbolos].tipo = strdup(tipo);
@@ -136,7 +137,15 @@ fun_declaration:
       } 
       RPAREN 
       compound_stmt {
+            int idx = busca(escopo_atual, "global");
+            if (idx != -1) {
+                if (strcmp(tabela[idx].tipo, "int") == 0 && has_return == 0) {
+                    printf("Erro semantico: funcao '%s' do tipo int deve ter um return.\n", escopo_atual);
+                }
+            }
+
             escopo_atual = "global";
+            has_return = 0;
       }
     ;
 
@@ -193,7 +202,9 @@ statement:
     | compound_stmt
     | selection_stmt
     | iteration_stmt
-    | return_stmt
+    | return_stmt {
+        has_return = 1;
+    }
     | io_stmt
     | call_stmt  /* NOVO: chamada de função como statement */
     ;
@@ -238,8 +249,15 @@ iteration_stmt:
     ;
 
 return_stmt:
-      RETURN SEMI
-    | RETURN expression SEMI
+      RETURN SEMI { 
+        int id = busca(escopo_atual, "global");
+        if (id != -1) {
+            if (strcmp(tabela[id].tipo, "int") == 0) {
+                printf("Erro semantico: funcao '%s' do tipo int tem que retornar valor.\n", escopo_atual);
+            }
+        }
+     }
+    | RETURN expression SEMI 
     ;
 
 /* Suporte a elementos de array no lado esquerdo da atribuição */
@@ -338,7 +356,7 @@ arg_list:
 %%
 
 void yyerror(const char *s) {
-    printf("\n[ERRO SINTATICO]: %s\n", s);
+    printf("\n[ERRO SINTATICO na linha %d]: %s\n", yylloc.first_line, s);
 }
 
 int main(int argc, char **argv) {

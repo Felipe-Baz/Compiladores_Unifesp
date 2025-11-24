@@ -90,6 +90,7 @@ typedef struct {
 Simbolo tabela[100];
 int n_simbolos = 0;
 char* escopo_atual = "global";
+int has_return = 0;
 
 
 int busca(char* nome, char* scope) {
@@ -111,7 +112,7 @@ void insere(char* nome, char* tipo, int linha, char* scope, int param_counter) {
         printf("Erro semantico: variavel '%s' ja declarada.\n", nome);
         return;
     }
-    printf("Foi inserido o %s com tipo %s, linha: %d, escopo: %s\n", nome, tipo, linha, scope);
+    // printf("Foi inserido o %s com tipo %s, linha: %d, escopo: %s\n", nome, tipo, linha, scope);
 
     tabela[n_simbolos].nome = strdup(nome);
     tabela[n_simbolos].tipo = strdup(tipo);
@@ -124,7 +125,7 @@ void insere(char* nome, char* tipo, int linha, char* scope, int param_counter) {
 
 
 /* Line 189 of yacc.c  */
-#line 128 "parser.tab.c"
+#line 129 "parser.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -190,7 +191,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 57 "parser.y"
+#line 58 "parser.y"
 
     int ival;
     char *sval;
@@ -200,7 +201,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 204 "parser.tab.c"
+#line 205 "parser.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -225,7 +226,7 @@ typedef struct YYLTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 229 "parser.tab.c"
+#line 230 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -538,14 +539,14 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    79,    79,    89,    90,    94,    95,   100,   114,   116,
-     120,   131,   120,   145,   146,   150,   151,   155,   167,   173,
-     174,   178,   182,   183,   187,   188,   192,   193,   194,   195,
-     196,   197,   198,   203,   223,   227,   228,   232,   233,   237,
-     241,   242,   247,   253,   259,   263,   264,   268,   268,   268,
-     268,   268,   268,   272,   273,   277,   277,   281,   282,   286,
-     286,   290,   291,   299,   314,   324,   325,   329,   330,   334,
-     335
+       0,    80,    80,    90,    91,    95,    96,   101,   115,   117,
+     121,   132,   121,   154,   155,   159,   160,   164,   176,   182,
+     183,   187,   191,   192,   196,   197,   201,   202,   203,   204,
+     205,   208,   209,   214,   234,   238,   239,   243,   244,   248,
+     252,   260,   265,   271,   277,   281,   282,   286,   286,   286,
+     286,   286,   286,   290,   291,   295,   295,   299,   300,   304,
+     304,   308,   309,   317,   332,   342,   343,   347,   348,   352,
+     353
 };
 #endif
 
@@ -1569,7 +1570,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 79 "parser.y"
+#line 80 "parser.y"
     { 
         if(busca("main", "global") == -1) {
             printf("Erro semantico: funcao 'main' nao declarada.\n");
@@ -1582,7 +1583,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 100 "parser.y"
+#line 101 "parser.y"
     {
         int id = busca((yyvsp[(2) - (4)].sval), escopo_atual);
         if (id != -1) {
@@ -1600,7 +1601,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 120 "parser.y"
+#line 121 "parser.y"
     {
             int id = busca((yyvsp[(2) - (3)].sval), escopo_atual);
 
@@ -1617,7 +1618,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 131 "parser.y"
+#line 132 "parser.y"
     {
             int idx = busca((yyvsp[(2) - (5)].sval), "global");
             if (idx != -1) {
@@ -1629,44 +1630,52 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 138 "parser.y"
+#line 139 "parser.y"
     {
+            int idx = busca(escopo_atual, "global");
+            if (idx != -1) {
+                if (strcmp(tabela[idx].tipo, "int") == 0 && has_return == 0) {
+                    printf("Erro semantico: funcao '%s' do tipo int deve ter um return.\n", escopo_atual);
+                }
+            }
+
             escopo_atual = "global";
+            has_return = 0;
       ;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 145 "parser.y"
+#line 154 "parser.y"
     { (yyval.param_count) = (yyvsp[(1) - (1)].param_count); ;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 146 "parser.y"
+#line 155 "parser.y"
     { (yyval.param_count) = 0; ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 150 "parser.y"
+#line 159 "parser.y"
     { (yyval.param_count) = (yyvsp[(1) - (3)].param_count) + 1; ;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 151 "parser.y"
+#line 160 "parser.y"
     { (yyval.param_count) = 1; ;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 155 "parser.y"
+#line 164 "parser.y"
     {
           int id = busca((yyvsp[(2) - (2)].sval), escopo_atual);
           if (id != -1) {
@@ -1684,7 +1693,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 167 "parser.y"
+#line 176 "parser.y"
     {
           insere((yyvsp[(2) - (4)].sval), (yyvsp[(1) - (4)].tipo), (yylsp[(2) - (4)]).first_line, escopo_atual, 0);
       ;}
@@ -1693,21 +1702,30 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 173 "parser.y"
+#line 182 "parser.y"
     { (yyval.tipo) = "int"; ;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 174 "parser.y"
+#line 183 "parser.y"
     { (yyval.tipo) = "void"; ;}
+    break;
+
+  case 30:
+
+/* Line 1455 of yacc.c  */
+#line 205 "parser.y"
+    {
+        has_return = 1;
+    ;}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 203 "parser.y"
+#line 214 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (5)].sval), escopo_atual);
           if (idx == -1) {
@@ -1726,10 +1744,24 @@ yyreduce:
       ;}
     break;
 
+  case 40:
+
+/* Line 1455 of yacc.c  */
+#line 252 "parser.y"
+    { 
+        int id = busca(escopo_atual, "global");
+        if (id != -1) {
+            if (strcmp(tabela[id].tipo, "int") == 0) {
+                printf("Erro semantico: funcao '%s' do tipo int tem que retornar valor.\n", escopo_atual);
+            }
+        }
+     ;}
+    break;
+
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 247 "parser.y"
+#line 265 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (3)].sval), escopo_atual);
           if (idx == -1) {
@@ -1741,7 +1773,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 253 "parser.y"
+#line 271 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (6)].sval), escopo_atual);
           if (idx == -1) {
@@ -1753,7 +1785,7 @@ yyreduce:
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 291 "parser.y"
+#line 309 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (1)].sval), escopo_atual);
           if (idx == -1) {
@@ -1767,7 +1799,7 @@ yyreduce:
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 299 "parser.y"
+#line 317 "parser.y"
     {
           /* CHAMADA DE FUNÇÃO DENTRO DE EXPRESSÃO - retorno é usado */
           int idx = busca((yyvsp[(1) - (4)].sval), escopo_atual);
@@ -1788,7 +1820,7 @@ yyreduce:
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 314 "parser.y"
+#line 332 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (4)].sval), escopo_atual);
           if (idx == -1) {
@@ -1804,35 +1836,35 @@ yyreduce:
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 329 "parser.y"
+#line 347 "parser.y"
     { (yyval.param_count) = (yyvsp[(1) - (1)].param_count); ;}
     break;
 
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 330 "parser.y"
+#line 348 "parser.y"
     { (yyval.param_count) = 0; ;}
     break;
 
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 334 "parser.y"
+#line 352 "parser.y"
     { (yyval.param_count) = (yyvsp[(1) - (3)].param_count) + 1; ;}
     break;
 
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 335 "parser.y"
+#line 353 "parser.y"
     { (yyval.param_count) = 1; ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1836 "parser.tab.c"
+#line 1868 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2051,11 +2083,11 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 338 "parser.y"
+#line 356 "parser.y"
 
 
 void yyerror(const char *s) {
-    printf("\n[ERRO SINTATICO]: %s\n", s);
+    printf("\n[ERRO SINTATICO na linha %d]: %s\n", yylloc.first_line, s);
 }
 
 int main(int argc, char **argv) {

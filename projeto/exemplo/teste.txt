@@ -1,0 +1,80 @@
+/* Código 2: versão organizada, com todos os erros */
+
+int a;
+
+/* ERRO 7: variável e função com mesmo nome */
+int x(void) 
+{ 
+    return 1; 
+}
+int x;    // variável com mesmo nome de função
+
+/* ERRO 1: uso de variável não declarada */
+void t1(void) {
+    y = 10; // y não declarado
+}
+
+/* ERRO 3: variável declarada void */
+void t2(void) {
+    void z;
+}
+
+/* ERRO 4: duplicidade de variável */
+void t3(void) {
+    int k;
+    int k;
+}
+
+/* ERRO 5: chamada de função não declarada */
+void t4(void) {
+    int v;
+    v = funcaoInexistente();
+}
+
+/* ERRO 8: chamada com número errado de parâmetros */
+void soma2(int a, int b) {}
+
+void t5(void) {
+    soma2(10); // faltou 1 parâmetro
+}
+
+/* ERRO 9: chamada com tipo errado */
+void soma3(int a, void b) {}
+
+void t6(void) {
+    int m;
+    int n;
+    soma3(m, n); // segundo argumento deveria ser void
+}
+
+/* ERRO 10: função int retornando sem valor */
+int t7(void) {
+    return; // errado
+}
+
+/* ERRO 11: variável fora do escopo */
+void t8(void) {
+    if (1) {
+        int p;
+        p = 10;
+    }
+    p = 20; // p não existe aqui
+}
+
+/* ERRO 12: atribuição inválida */
+void t9(void) {
+    int r;
+    r = t2(); // t2 é void, r é int
+}
+
+/* ERRO 14: break e continue fora de loop */
+void t10(void) {
+    break;
+    continue;
+}
+
+/* ERRO 6: main() não declarada corretamente */
+void main(void) { }
+
+/* ERRO extra: redefinir main como variável */
+int main;  // agora main está inválida
