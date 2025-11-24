@@ -541,11 +541,11 @@ static const yytype_uint16 yyrline[] =
        0,    79,    79,    89,    90,    94,    95,   100,   114,   116,
      120,   131,   120,   145,   146,   150,   151,   155,   167,   173,
      174,   178,   182,   183,   187,   188,   192,   193,   194,   195,
-     196,   197,   198,   203,   219,   223,   224,   228,   229,   233,
-     237,   238,   243,   249,   255,   259,   260,   264,   264,   264,
-     264,   264,   264,   268,   269,   273,   273,   277,   278,   282,
-     282,   286,   287,   295,   310,   320,   321,   325,   326,   330,
-     331
+     196,   197,   198,   203,   223,   227,   228,   232,   233,   237,
+     241,   242,   247,   253,   259,   263,   264,   268,   268,   268,
+     268,   268,   268,   272,   273,   277,   277,   281,   282,   286,
+     286,   290,   291,   299,   314,   324,   325,   329,   330,   334,
+     335
 };
 #endif
 
@@ -1716,6 +1716,10 @@ yyreduce:
             if (tabela[idx].param_counter != (yyvsp[(3) - (5)].param_count)) {
                   printf("Erro semantico: funcao '%s' espera %d parametro(s), mas recebeu %d argumento(s).\n", 
                          (yyvsp[(1) - (5)].sval), tabela[idx].param_counter, (yyvsp[(3) - (5)].param_count));
+              } else {
+                if(tabela[idx].tipo == "int") {
+                    printf("Aviso semantico: retorno da funcao '%s' do tipo int nao utilizado.\n", (yyvsp[(1) - (5)].sval));
+                }
               }
           }
           /* NÃO verifica tipo void aqui - é permitido chamar função void como statement */
@@ -1725,7 +1729,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 243 "parser.y"
+#line 247 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (3)].sval), escopo_atual);
           if (idx == -1) {
@@ -1737,7 +1741,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 249 "parser.y"
+#line 253 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (6)].sval), escopo_atual);
           if (idx == -1) {
@@ -1749,7 +1753,7 @@ yyreduce:
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 287 "parser.y"
+#line 291 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (1)].sval), escopo_atual);
           if (idx == -1) {
@@ -1763,7 +1767,7 @@ yyreduce:
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 295 "parser.y"
+#line 299 "parser.y"
     {
           /* CHAMADA DE FUNÇÃO DENTRO DE EXPRESSÃO - retorno é usado */
           int idx = busca((yyvsp[(1) - (4)].sval), escopo_atual);
@@ -1784,7 +1788,7 @@ yyreduce:
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 310 "parser.y"
+#line 314 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (4)].sval), escopo_atual);
           if (idx == -1) {
@@ -1800,35 +1804,35 @@ yyreduce:
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 325 "parser.y"
+#line 329 "parser.y"
     { (yyval.param_count) = (yyvsp[(1) - (1)].param_count); ;}
     break;
 
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 326 "parser.y"
+#line 330 "parser.y"
     { (yyval.param_count) = 0; ;}
     break;
 
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 330 "parser.y"
+#line 334 "parser.y"
     { (yyval.param_count) = (yyvsp[(1) - (3)].param_count) + 1; ;}
     break;
 
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 331 "parser.y"
+#line 335 "parser.y"
     { (yyval.param_count) = 1; ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1832 "parser.tab.c"
+#line 1836 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2047,7 +2051,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 334 "parser.y"
+#line 338 "parser.y"
 
 
 void yyerror(const char *s) {

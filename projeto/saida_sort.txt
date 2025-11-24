@@ -28,6 +28,7 @@
 [ID:a] [LBRACKET] [ID:i] [RBRACKET] [ASSIGN] [ID:t] [SEMI] 
 [ID:i] [ASSIGN] [ID:i] [PLUS] [NUM:1] [SEMI] 
 [RBRACE] 
+[ID:i] [ASSIGN] [ID:t] [SEMI] 
 [RBRACE] 
 
 [VOID] [ID:main] [LPAREN] [VOID] [RPAREN] 

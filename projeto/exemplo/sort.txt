@@ -29,6 +29,7 @@ void sort( int a[], int low, int high)
 		a[i] = t;
 		i = i + 1;
 	}
+	i = t;
 }
 
 void main(void)

@@ -208,6 +208,10 @@ call_stmt:
             if (tabela[idx].param_counter != $3) {
                   printf("Erro semantico: funcao '%s' espera %d parametro(s), mas recebeu %d argumento(s).\n", 
                          $1, tabela[idx].param_counter, $3);
+              } else {
+                if(tabela[idx].tipo == "int") {
+                    printf("Aviso semantico: retorno da funcao '%s' do tipo int nao utilizado.\n", $1);
+                }
               }
           }
           /* NÃO verifica tipo void aqui - é permitido chamar função void como statement */
