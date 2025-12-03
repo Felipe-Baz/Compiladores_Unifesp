@@ -1,9 +1,9 @@
-erro sintatico passar por todos os erros e n parar no primeiro
+erro sintatico passar por todos os erros e n parar no primeiro - fazer
 
-limerar memoria
+limerar memoria - talvez ok tem q testar
 
-yyerrork
+yyerrork - n sei
 
-valgrind (lixo de memoria)
+valgrind (lixo de memoria) - testar
 
-printar arvore sintatica
+printar arvore sintatica - talvez ta feito sla
