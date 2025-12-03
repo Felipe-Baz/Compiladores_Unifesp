@@ -21,6 +21,69 @@ int n_simbolos = 0;
 char* escopo_atual = "global";
 int has_return = 0;
 
+/* Geração de código intermediário */
+FILE *codigo_intermediario;
+int temp_count = 0;
+int label_count = 0;
+
+char* novo_temp() {
+    char* t = (char*)malloc(20);
+    sprintf(t, "t%d", temp_count++);
+    return t;
+}
+
+char* novo_label() {
+    char* l = (char*)malloc(20);
+    sprintf(l, "L%d", label_count++);
+    return l;
+}
+
+void emite(char* op, char* arg1, char* arg2, char* result) {
+    if (codigo_intermediario) {
+        if (arg2) {
+            fprintf(codigo_intermediario, "%s = %s %s %s\n", result, arg1, op, arg2);
+        } else if (arg1) {
+            fprintf(codigo_intermediario, "%s %s %s %s\n", op, arg1, arg2 ? arg2 : "", result ? result : "");
+        } else {
+            fprintf(codigo_intermediario, "%s %s\n", op, result ? result : "");
+        }
+    }
+}
+
+void emite_label(char* label) {
+    if (codigo_intermediario) {
+        fprintf(codigo_intermediario, "%s:\n", label);
+    }
+}
+
+void emite_goto(char* label) {
+    if (codigo_intermediario) {
+        fprintf(codigo_intermediario, "goto %s\n", label);
+    }
+}
+
+void emite_if(char* cond, char* op, char* label) {
+    if (codigo_intermediario) {
+        fprintf(codigo_intermediario, "if %s %s goto %s\n", cond, op, label);
+    }
+}
+
+void emite_param(char* param) {
+    if (codigo_intermediario) {
+        fprintf(codigo_intermediario, "param %s\n", param);
+    }
+}
+
+void emite_call(char* func, int n_params, char* result) {
+    if (codigo_intermediario) {
+        if (result) {
+            fprintf(codigo_intermediario, "%s = call %s, %d\n", result, func, n_params);
+        } else {
+            fprintf(codigo_intermediario, "call %s, %d\n", func, n_params);
+        }
+    }
+}
+
 
 int busca(char* nome, char* scope) {
     for (int i = 0; i < n_simbolos; i++) {
@@ -60,6 +123,10 @@ void insere(char* nome, char* tipo, int linha, char* scope, int param_counter) {
     char *sval;
     char *tipo;
     int param_count;
+    struct {
+        char* addr;  /* endereço (temporário ou variável) */
+        char* tipo;  /* tipo da expressão */
+    } expr_attr;
 }
 
 /* Tokens */
@@ -71,7 +138,8 @@ void insere(char* nome, char* tipo, int linha, char* scope, int param_counter) {
 %token <sval> ID
 %token <ival> NUM
 
-%type <tipo> type_specifier expression simple_expression additive_expression term factor
+%type <tipo> type_specifier
+%type <expr_attr> expression simple_expression additive_expression term factor
 %type <param_count> params param_list args arg_list
 
 %%
@@ -128,6 +196,11 @@ fun_declaration:
             }
 
             escopo_atual = strdup($2);
+            
+            /* Gera label de entrada da função */
+            if (codigo_intermediario) {
+                fprintf(codigo_intermediario, "\nfunc %s\n", $2);
+            }
       } 
       params {
             int idx = busca($<sval>2, "global");
@@ -142,6 +215,11 @@ fun_declaration:
                 if (strcmp(tabela[idx].tipo, "int") == 0 && has_return == 0) {
                     printf("Erro semantico: funcao '%s' do tipo int deve ter um return.\n", escopo_atual);
                 }
+            }
+
+            /* Gera label de saída da função */
+            if (codigo_intermediario) {
+                fprintf(codigo_intermediario, "endfunc %s\n", escopo_atual);
             }
 
             escopo_atual = "global";
@@ -225,13 +303,21 @@ call_stmt:
                 }
               }
           }
+          
+          /* Gera código para chamada de função como statement */
+          emite_call($1, $3, NULL);
           /* NÃO verifica tipo void aqui - é permitido chamar função void como statement */
       }
     ;
 
 /* Novos statements de I/O */
 io_stmt:
-      OUTPUT LPAREN expression RPAREN SEMI
+      OUTPUT LPAREN expression RPAREN SEMI {
+          /* Gera código para output */
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "output(%s)\n", $3.addr);
+          }
+      }
     ;
 
 expression_stmt:
@@ -240,12 +326,54 @@ expression_stmt:
     ;
 
 selection_stmt:
-      IF LPAREN expression RPAREN statement
-    | IF LPAREN expression RPAREN statement ELSE statement
+      IF LPAREN expression RPAREN {
+          /* Gera label e condicional */
+          char* label_fim = novo_label();
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "ifFalse %s goto %s\n", $3.addr, label_fim);
+          }
+          $<sval>$ = label_fim; /* salva label para uso posterior */
+      } statement {
+          /* Emite label de fim do if */
+          emite_label($<sval>5);
+      }
+    | IF LPAREN expression RPAREN {
+          /* Gera labels para if-else */
+          char* label_else = novo_label();
+          char* label_fim = novo_label();
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "ifFalse %s goto %s\n", $3.addr, label_else);
+          }
+          $<sval>$ = label_else;
+          $<sval>0 = label_fim; /* hack: armazena label_fim em posição anterior */
+      } statement {
+          char* label_fim = novo_label();
+          emite_goto(label_fim);
+          emite_label($<sval>5); /* label do else */
+          $<sval>$ = label_fim;
+      } ELSE statement {
+          emite_label($<sval>7); /* label de fim */
+      }
     ;
 
 iteration_stmt:
-      WHILE LPAREN expression RPAREN statement
+      WHILE {
+          /* Gera label de início do loop */
+          char* label_inicio = novo_label();
+          emite_label(label_inicio);
+          $<sval>$ = label_inicio;
+      } LPAREN expression RPAREN {
+          /* Gera label de saída e condicional */
+          char* label_fim = novo_label();
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "ifFalse %s goto %s\n", $4.addr, label_fim);
+          }
+          $<sval>$ = label_fim;
+      } statement {
+          /* Volta ao início e emite label de fim */
+          emite_goto($<sval>2);
+          emite_label($<sval>6);
+      }
     ;
 
 return_stmt:
@@ -256,8 +384,18 @@ return_stmt:
                 printf("Erro semantico: funcao '%s' do tipo int tem que retornar valor.\n", escopo_atual);
             }
         }
+        
+        /* Gera código para return sem valor */
+        if (codigo_intermediario) {
+            fprintf(codigo_intermediario, "return\n");
+        }
      }
-    | RETURN expression SEMI 
+    | RETURN expression SEMI {
+        /* Gera código para return com valor */
+        if (codigo_intermediario) {
+            fprintf(codigo_intermediario, "return %s\n", $2.addr);
+        }
+    }
     ;
 
 /* Suporte a elementos de array no lado esquerdo da atribuição */
@@ -266,20 +404,53 @@ expression:
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+          } else {
+              /* Gera código: ID = expressão */
+              if (codigo_intermediario) {
+                  fprintf(codigo_intermediario, "%s = %s\n", $1, $3.addr);
+              }
+              $$.addr = strdup($1);
+              $$.tipo = tabela[idx].tipo;
           }
       }
     | ID LBRACKET expression RBRACKET ASSIGN expression {
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+          } else {
+              /* Gera código: ID[index] = expressão */
+              if (codigo_intermediario) {
+                  fprintf(codigo_intermediario, "%s[%s] = %s\n", $1, $3.addr, $6.addr);
+              }
+              $$.addr = strdup($1);
+              $$.tipo = tabela[idx].tipo;
           }
     }
-    | simple_expression
+    | simple_expression {
+          $$.addr = $1.addr;
+          $$.tipo = $1.tipo;
+    }
     ;
 
 simple_expression:
-      additive_expression relop additive_expression
-    | additive_expression
+      additive_expression relop additive_expression {
+          char* temp = novo_temp();
+          char op[10];
+          
+          /* Determina o operador relacional */
+          /* Nota: precisaríamos passar o operador via $2, mas por simplicidade 
+             vamos usar um operador genérico aqui */
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "%s = %s relop %s\n", temp, $1.addr, $3.addr);
+          }
+          
+          $$.addr = temp;
+          $$.tipo = "int";
+      }
+    | additive_expression {
+          $$.addr = $1.addr;
+          $$.tipo = $1.tipo;
+      }
     ;
 
 relop:
@@ -287,8 +458,21 @@ relop:
     ;
 
 additive_expression:
-      additive_expression addop term
-    | term
+      additive_expression addop term {
+          char* temp = novo_temp();
+          
+          /* Gera código de três endereços para adição/subtração */
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "%s = %s addop %s\n", temp, $1.addr, $3.addr);
+          }
+          
+          $$.addr = temp;
+          $$.tipo = "int";
+      }
+    | term {
+          $$.addr = $1.addr;
+          $$.tipo = $1.tipo;
+      }
     ;
 
 addop:
@@ -296,8 +480,21 @@ addop:
     ;
 
 term:
-      term mulop factor
-    | factor
+      term mulop factor {
+          char* temp = novo_temp();
+          
+          /* Gera código de três endereços para multiplicação/divisão */
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "%s = %s mulop %s\n", temp, $1.addr, $3.addr);
+          }
+          
+          $$.addr = temp;
+          $$.tipo = "int";
+      }
+    | factor {
+          $$.addr = $1.addr;
+          $$.tipo = $1.tipo;
+      }
     ;
 
 mulop:
@@ -305,13 +502,23 @@ mulop:
     ;
 
 factor:
-      LPAREN expression RPAREN
+      LPAREN expression RPAREN {
+          $$.addr = $2.addr;
+          $$.tipo = $2.tipo;
+      }
     | ID {
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
+              $$.addr = strdup($1);
+              $$.tipo = "int";
           } else if (strcmp(tabela[idx].tipo, "void") == 0) {
               printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
+              $$.addr = strdup($1);
+              $$.tipo = "void";
+          } else {
+              $$.addr = strdup($1);
+              $$.tipo = tabela[idx].tipo;
           }
     }
     | ID LPAREN args RPAREN {
@@ -328,6 +535,13 @@ factor:
                          $1, tabela[idx].param_counter, $3);
               }
           }
+          
+          /* Gera código de chamada de função */
+          char* temp = novo_temp();
+          emite_call($1, $3, temp);
+          
+          $$.addr = temp;
+          $$.tipo = (idx != -1) ? tabela[idx].tipo : "int";
     }
     | ID LBRACKET expression RBRACKET {
           int idx = busca($1, escopo_atual);
@@ -335,12 +549,33 @@ factor:
               printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
           }
 
-          if (strcmp(tabela[idx].tipo, "void") == 0) {
+          if (idx != -1 && strcmp(tabela[idx].tipo, "void") == 0) {
               printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
           }
+          
+          /* Gera código para acesso a array */
+          char* temp = novo_temp();
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "%s = %s[%s]\n", temp, $1, $3.addr);
+          }
+          
+          $$.addr = temp;
+          $$.tipo = (idx != -1) ? tabela[idx].tipo : "int";
     }
-    | NUM
-    | INPUT LPAREN RPAREN
+    | NUM {
+          char* num_str = (char*)malloc(20);
+          sprintf(num_str, "%d", $1);
+          $$.addr = num_str;
+          $$.tipo = "int";
+      }
+    | INPUT LPAREN RPAREN {
+          char* temp = novo_temp();
+          if (codigo_intermediario) {
+              fprintf(codigo_intermediario, "%s = input()\n", temp);
+          }
+          $$.addr = temp;
+          $$.tipo = "int";
+      }
     ;
 
 args:
@@ -361,7 +596,7 @@ void yyerror(const char *s) {
 
 int main(int argc, char **argv) {
     if (argc < 3) {
-        fprintf(stderr, "Uso: %s <entrada.c-> <saida.txt>\n", argv[0]);
+        fprintf(stderr, "Uso: %s <entrada.c-> <saida.txt> [codigo_intermediario.txt]\n", argv[0]);
         return 1;
     }
 
@@ -378,9 +613,25 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    /* Abre arquivo de código intermediário se fornecido */
+    if (argc >= 4) {
+        codigo_intermediario = fopen(argv[3], "w");
+        if (!codigo_intermediario) {
+            perror("Aviso: não foi possível abrir arquivo de código intermediário");
+        } else {
+            fprintf(codigo_intermediario, "# Código Intermediário - Three Address Code\n\n");
+        }
+    }
+
     yyparse();
 
     fclose(yyin);
     fclose(out);
+    
+    if (codigo_intermediario) {
+        fclose(codigo_intermediario);
+        printf("\n[Codigo intermediario gerado com sucesso]\n");
+    }
+    
     return 0;
 }
