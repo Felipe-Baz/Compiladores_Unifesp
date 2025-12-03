@@ -51,6 +51,14 @@ void insere(char* nome, char* tipo, int linha, char* scope, int param_counter) {
 
     n_simbolos++;
 }
+
+void liberar_tabela() {
+    for (int i = 0; i < n_simbolos; i++) {
+        free(tabela[i].nome);
+        free(tabela[i].tipo);
+        free(tabela[i].scope);
+    }
+}
 %}
 
 %locations
@@ -109,6 +117,7 @@ var_declaration:
                 insere($2, $1, @2.first_line, escopo_atual, 0);
             }
         }
+        free($2);
       }
     ;
 
@@ -127,6 +136,9 @@ fun_declaration:
                 insere($2, $1, @2.first_line, escopo_atual, 0);
             }
 
+            if (strcmp(escopo_atual, "global") != 0) {
+                free(escopo_atual);
+            }
             escopo_atual = strdup($2);
       } 
       params {
@@ -144,6 +156,9 @@ fun_declaration:
                 }
             }
 
+            if (strcmp(escopo_atual, "global") != 0) {
+                free(escopo_atual);
+            }
             escopo_atual = "global";
             has_return = 0;
       }
@@ -172,9 +187,11 @@ param:
                   insere($2, $1, @2.first_line, escopo_atual, 0);
               }
           }
+          free($2);
       }
     | type_specifier ID LBRACKET RBRACKET {
           insere($2, $1, @2.first_line, escopo_atual, 0);
+          free($2);
       }
     ;
 
@@ -225,6 +242,7 @@ call_stmt:
                 }
               }
           }
+          free($1);
           /* NÃO verifica tipo void aqui - é permitido chamar função void como statement */
       }
     ;
@@ -267,12 +285,14 @@ expression:
           if (idx == -1) {
               printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
           }
+          free($1);
       }
     | ID LBRACKET expression RBRACKET ASSIGN expression {
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: variavel '%s' nao declarada.\n", $1);
           }
+          free($1);
     }
     | simple_expression
     ;
@@ -313,6 +333,7 @@ factor:
           } else if (strcmp(tabela[idx].tipo, "void") == 0) {
               printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
           }
+          free($1);
     }
     | ID LPAREN args RPAREN {
           /* CHAMADA DE FUNÇÃO DENTRO DE EXPRESSÃO - retorno é usado */
@@ -328,6 +349,7 @@ factor:
                          $1, tabela[idx].param_counter, $3);
               }
           }
+          free($1);
     }
     | ID LBRACKET expression RBRACKET {
           int idx = busca($1, escopo_atual);
@@ -338,6 +360,7 @@ factor:
           if (strcmp(tabela[idx].tipo, "void") == 0) {
               printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
           }
+          free($1);
     }
     | NUM
     | INPUT LPAREN RPAREN
@@ -379,6 +402,11 @@ int main(int argc, char **argv) {
     }
 
     yyparse();
+
+    liberar_tabela();
+    if (strcmp(escopo_atual, "global") != 0) {
+        free(escopo_atual);
+    }
 
     fclose(yyin);
     fclose(out);
