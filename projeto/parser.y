@@ -186,6 +186,23 @@ void liberar_tabela() {
         free(tabela[i].scope);
     }
 }
+
+void imprimir_tabela_simbolos(FILE* arquivo) {
+    fprintf(arquivo, "=== TABELA DE SIMBOLOS ===\n\n");
+    fprintf(arquivo, "%-20s %-10s %-10s %-15s %-10s\n", "Nome", "Tipo", "Linha", "Escopo", "Parametros");
+    fprintf(arquivo, "--------------------------------------------------------------------------------\n");
+    
+    for (int i = 0; i < n_simbolos; i++) {
+        fprintf(arquivo, "%-20s %-10s %-10d %-15s %-10d\n", 
+                tabela[i].nome, 
+                tabela[i].tipo, 
+                tabela[i].linha, 
+                tabela[i].scope,
+                tabela[i].param_counter);
+    }
+    
+    fprintf(arquivo, "\nTotal de simbolos: %d\n", n_simbolos);
+}
 %}
 
 %locations
@@ -737,8 +754,8 @@ void yyerror(const char *s) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 4) {
-        fprintf(stderr, "Uso: %s <entrada.c-> <saida.txt> <arvore.txt>\n", argv[0]);
+    if (argc < 5) {
+        fprintf(stderr, "Uso: %s <entrada.c-> <saida.txt> <arvore.txt> <tabela.txt>\n", argv[0]);
         return 1;
     }
 
@@ -775,6 +792,17 @@ int main(int argc, char **argv) {
     }
 
     fclose(astFile);
+
+    // Imprimir a tabela de símbolos no arquivo separado
+    FILE* tabelaFile = fopen(argv[4], "w");
+    if (!tabelaFile) {
+        perror("Erro ao abrir arquivo de tabela de simbolos");
+        fclose(yyin);
+        return 1;
+    }
+
+    imprimir_tabela_simbolos(tabelaFile);
+    fclose(tabelaFile);
 
     liberar_tabela();
     if (strcmp(escopo_atual, "global") != 0) {
