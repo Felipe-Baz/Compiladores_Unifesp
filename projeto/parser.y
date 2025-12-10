@@ -245,8 +245,7 @@ program:
         } else {
             printf("[ANALISE SINTATICA - OK]\n"); 
         }
-        root = createNode(NODE_PROG);
-        addChild(root, $1);
+        root = $1;
         $$ = root;
     }
     ;
@@ -612,8 +611,9 @@ expression:
           TreeNode* assignNode = createNode(NODE_ASSIGN);
           TreeNode* idNode = createNode(NODE_ID);
           idNode->name = strdup($1);
+          // Adiciona o índice como filho do ID
+          addChild(idNode, $3);
           addChild(assignNode, idNode);
-          addChild(assignNode, $3);
           addChild(assignNode, $6);
           $$ = assignNode;
           
@@ -739,6 +739,8 @@ factor:
           
           TreeNode* idNode = createNode(NODE_ID);
           idNode->name = strdup($1);
+          // Adiciona o índice como filho do ID
+          addChild(idNode, $3);
           $$ = idNode;
           
           free($1);
