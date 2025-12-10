@@ -2,9 +2,9 @@ Stmt: Prog
 ----Exp: Type: int
 --------Stmt: Func: gcd
 ------------Exp: Type: int
-----------------Stmt: Var
+----------------Stmt: Var: u
 ------------Exp: Type: int
-----------------Stmt: Var
+----------------Stmt: Var: v
 ------------Stmt: Prog
 ----------------Stmt: If
 --------------------Exp: Op: COMP
@@ -27,9 +27,9 @@ Stmt: Prog
 ------------Stmt: Func: main
 ----------------Stmt: Prog
 --------------------Exp: Type: int
-------------------------Stmt: Var
+------------------------Stmt: Var: x
 --------------------Exp: Type: int
-------------------------Stmt: Var
+------------------------Stmt: Var: y
 --------------------Stmt: Assign
 ------------------------Exp: Id: x
 ------------------------Stmt: Input

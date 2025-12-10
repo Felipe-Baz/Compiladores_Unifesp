@@ -95,7 +95,11 @@ void printAST(TreeNode* node, int depth) {
             fprintf(out, "Stmt: Func: %s\n", node->name);
             break;
         case NODE_VAR:
-            fprintf(out, "Stmt: Var\n");
+            if (node->name != NULL) {
+                fprintf(out, "Stmt: Var: %s\n", node->name);
+            } else {
+                fprintf(out, "Stmt: Var\n");
+            }
             break;
         case NODE_TYPE:
             fprintf(out, "Exp: Type: %s\n", node->name);
@@ -279,6 +283,7 @@ var_declaration:
         TreeNode* typeNode = createNode(NODE_TYPE);
         typeNode->name = strdup($1);
         TreeNode* varNode = createNode(NODE_VAR);
+        varNode->name = strdup($2);
         addChild(typeNode, varNode);
         $$ = typeNode;
         
@@ -372,6 +377,7 @@ param:
           TreeNode* typeNode = createNode(NODE_TYPE);
           typeNode->name = strdup($1);
           TreeNode* varNode = createNode(NODE_VAR);
+          varNode->name = strdup($2);
           addChild(typeNode, varNode);
           $$ = typeNode;
           
@@ -386,6 +392,7 @@ param:
           TreeNode* typeNode = createNode(NODE_TYPE);
           typeNode->name = strdup($1);
           TreeNode* varNode = createNode(NODE_VAR);
+          varNode->name = strdup($2);
           addChild(typeNode, varNode);
           $$ = typeNode;
           

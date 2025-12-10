@@ -2,9 +2,9 @@ Stmt: Prog
 ----Exp: Type: int
 --------Stmt: Func: gcd
 ------------Exp: Type: int
-----------------Stmt: Var
+----------------Stmt: Var: u
 ------------Exp: Type: int
-----------------Stmt: Var
+----------------Stmt: Var: v
 ------------Stmt: Prog
 ----------------Stmt: If
 --------------------Exp: Op: COMP
