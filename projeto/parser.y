@@ -407,7 +407,10 @@ param:
           TreeNode* typeNode = createNode(NODE_TYPE);
           typeNode->name = strdup($1);
           TreeNode* varNode = createNode(NODE_VAR);
-          varNode->name = strdup($2);
+          // Adiciona [] ao nome para indicar que é um parâmetro array
+          char* arrayName = (char*)malloc(strlen($2) + 3);
+          sprintf(arrayName, "%s[]", $2);
+          varNode->name = arrayName;
           addChild(typeNode, varNode);
           $$ = typeNode;
           
@@ -610,7 +613,9 @@ expression:
           
           TreeNode* assignNode = createNode(NODE_ASSIGN);
           TreeNode* idNode = createNode(NODE_ID);
-          idNode->name = strdup($1);
+          char* arrayName = (char*)malloc(strlen($1) + 3);
+          sprintf(arrayName, "%s[]", $1);
+          idNode->name = arrayName;
           // Adiciona o índice como filho do ID
           addChild(idNode, $3);
           addChild(assignNode, idNode);
@@ -738,7 +743,9 @@ factor:
           }
           
           TreeNode* idNode = createNode(NODE_ID);
-          idNode->name = strdup($1);
+          char* arrayName = (char*)malloc(strlen($1) + 3);
+          sprintf(arrayName, "%s[]", $1);
+          idNode->name = arrayName;
           // Adiciona o índice como filho do ID
           addChild(idNode, $3);
           $$ = idNode;

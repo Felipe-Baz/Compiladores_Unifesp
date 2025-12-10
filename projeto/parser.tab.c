@@ -698,13 +698,13 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint16 yyrline[] =
 {
        0,   242,   242,   254,   262,   270,   271,   276,   306,   307,
-     315,   330,   315,   370,   371,   375,   376,   380,   404,   422,
-     423,   427,   450,   459,   463,   473,   477,   478,   479,   480,
-     481,   485,   486,   491,   491,   525,   533,   534,   538,   544,
-     554,   563,   575,   590,   605,   622,   626,   633,   637,   637,
-     637,   637,   637,   637,   641,   646,   650,   655,   663,   668,
-     672,   677,   685,   686,   700,   700,   730,   748,   753,   760,
-     761,   765,   769
+     315,   330,   315,   370,   371,   375,   376,   380,   404,   425,
+     426,   430,   453,   462,   466,   476,   480,   481,   482,   483,
+     484,   488,   489,   494,   494,   528,   536,   537,   541,   547,
+     557,   566,   578,   593,   608,   627,   631,   638,   642,   642,
+     642,   642,   642,   642,   646,   651,   655,   660,   668,   673,
+     677,   682,   690,   691,   705,   705,   735,   755,   760,   767,
+     768,   772,   776
 };
 #endif
 
@@ -1966,7 +1966,10 @@ yyreduce:
           TreeNode* typeNode = createNode(NODE_TYPE);
           typeNode->name = strdup((yyvsp[(1) - (4)].tipo));
           TreeNode* varNode = createNode(NODE_VAR);
-          varNode->name = strdup((yyvsp[(2) - (4)].sval));
+          // Adiciona [] ao nome para indicar que é um parâmetro array
+          char* arrayName = (char*)malloc(strlen((yyvsp[(2) - (4)].sval)) + 3);
+          sprintf(arrayName, "%s[]", (yyvsp[(2) - (4)].sval));
+          varNode->name = arrayName;
           addChild(typeNode, varNode);
           (yyval.node) = typeNode;
           
@@ -1980,21 +1983,21 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 422 "parser.y"
+#line 425 "parser.y"
     { (yyval.tipo) = "int"; ;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 423 "parser.y"
+#line 426 "parser.y"
     { (yyval.tipo) = "void"; ;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 427 "parser.y"
+#line 430 "parser.y"
     {
         // Cria um nó container para o compound statement
         TreeNode* compoundNode = createNode(NODE_PROG);
@@ -2020,7 +2023,7 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 450 "parser.y"
+#line 453 "parser.y"
     {
         if ((yyvsp[(1) - (2)].node) == NULL) {
             (yyval.node) = createNode(NODE_PROG);
@@ -2035,14 +2038,14 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 459 "parser.y"
+#line 462 "parser.y"
     { (yyval.node) = NULL; ;}
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 463 "parser.y"
+#line 466 "parser.y"
     {
         if ((yyvsp[(1) - (2)].node) == NULL) {
             (yyval.node) = createNode(NODE_PROG);
@@ -2058,42 +2061,42 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 473 "parser.y"
+#line 476 "parser.y"
     { (yyval.node) = createNode(NODE_PROG); ;}
     break;
 
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 477 "parser.y"
+#line 480 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 478 "parser.y"
+#line 481 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 479 "parser.y"
+#line 482 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 480 "parser.y"
+#line 483 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 481 "parser.y"
+#line 484 "parser.y"
     {
         has_return = 1;
         (yyval.node) = (yyvsp[(1) - (1)].node);
@@ -2103,28 +2106,28 @@ yyreduce:
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 485 "parser.y"
+#line 488 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 486 "parser.y"
+#line 489 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 491 "parser.y"
+#line 494 "parser.y"
     { temp_args_count = 0; ;}
     break;
 
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 491 "parser.y"
+#line 494 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (6)].sval), escopo_atual);
           if (idx == -1) {
@@ -2160,7 +2163,7 @@ yyreduce:
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 525 "parser.y"
+#line 528 "parser.y"
     {
         TreeNode* outputNode = createNode(NODE_OUTPUT);
         addChild(outputNode, (yyvsp[(3) - (5)].node));
@@ -2171,21 +2174,21 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 533 "parser.y"
+#line 536 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (2)].node); ;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 534 "parser.y"
+#line 537 "parser.y"
     { (yyval.node) = NULL; ;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 538 "parser.y"
+#line 541 "parser.y"
     {
         TreeNode* ifNode = createNode(NODE_IF);
         addChild(ifNode, (yyvsp[(3) - (5)].node));
@@ -2197,7 +2200,7 @@ yyreduce:
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 544 "parser.y"
+#line 547 "parser.y"
     {
         TreeNode* ifNode = createNode(NODE_IF);
         addChild(ifNode, (yyvsp[(3) - (7)].node));
@@ -2210,7 +2213,7 @@ yyreduce:
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 554 "parser.y"
+#line 557 "parser.y"
     {
         TreeNode* whileNode = createNode(NODE_WHILE);
         addChild(whileNode, (yyvsp[(3) - (5)].node));
@@ -2222,7 +2225,7 @@ yyreduce:
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 563 "parser.y"
+#line 566 "parser.y"
     { 
         int id = busca(escopo_atual, "global");
         if (id != -1) {
@@ -2240,7 +2243,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 575 "parser.y"
+#line 578 "parser.y"
     {
         int id = busca(escopo_atual, "global");
         TreeNode* returnNode = createNode(NODE_RETURN);
@@ -2257,7 +2260,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 590 "parser.y"
+#line 593 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (3)].sval), escopo_atual);
           if (idx == -1) {
@@ -2278,7 +2281,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 605 "parser.y"
+#line 608 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (6)].sval), escopo_atual);
           if (idx == -1) {
@@ -2287,7 +2290,9 @@ yyreduce:
           
           TreeNode* assignNode = createNode(NODE_ASSIGN);
           TreeNode* idNode = createNode(NODE_ID);
-          idNode->name = strdup((yyvsp[(1) - (6)].sval));
+          char* arrayName = (char*)malloc(strlen((yyvsp[(1) - (6)].sval)) + 3);
+          sprintf(arrayName, "%s[]", (yyvsp[(1) - (6)].sval));
+          idNode->name = arrayName;
           // Adiciona o índice como filho do ID
           addChild(idNode, (yyvsp[(3) - (6)].node));
           addChild(assignNode, idNode);
@@ -2301,14 +2306,14 @@ yyreduce:
   case 45:
 
 /* Line 1455 of yacc.c  */
-#line 622 "parser.y"
+#line 627 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 46:
 
 /* Line 1455 of yacc.c  */
-#line 626 "parser.y"
+#line 631 "parser.y"
     {
         TreeNode* opNode = createNode(NODE_OP);
         opNode->op = strdup("COMP");
@@ -2321,14 +2326,14 @@ yyreduce:
   case 47:
 
 /* Line 1455 of yacc.c  */
-#line 633 "parser.y"
+#line 638 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 641 "parser.y"
+#line 646 "parser.y"
     {
         (yyval.node) = (yyvsp[(2) - (3)].node);
         addChild((yyval.node), (yyvsp[(1) - (3)].node));
@@ -2339,14 +2344,14 @@ yyreduce:
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 646 "parser.y"
+#line 651 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 650 "parser.y"
+#line 655 "parser.y"
     {
         TreeNode* opNode = createNode(NODE_OP);
         opNode->op = strdup("ADD");
@@ -2357,7 +2362,7 @@ yyreduce:
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 655 "parser.y"
+#line 660 "parser.y"
     {
         TreeNode* opNode = createNode(NODE_OP);
         opNode->op = strdup("SUB");
@@ -2368,7 +2373,7 @@ yyreduce:
   case 58:
 
 /* Line 1455 of yacc.c  */
-#line 663 "parser.y"
+#line 668 "parser.y"
     {
         (yyval.node) = (yyvsp[(2) - (3)].node);
         addChild((yyval.node), (yyvsp[(1) - (3)].node));
@@ -2379,14 +2384,14 @@ yyreduce:
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 668 "parser.y"
+#line 673 "parser.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 60:
 
 /* Line 1455 of yacc.c  */
-#line 672 "parser.y"
+#line 677 "parser.y"
     {
         TreeNode* opNode = createNode(NODE_OP);
         opNode->op = strdup("MULT");
@@ -2397,7 +2402,7 @@ yyreduce:
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 677 "parser.y"
+#line 682 "parser.y"
     {
         TreeNode* opNode = createNode(NODE_OP);
         opNode->op = strdup("DIV");
@@ -2408,14 +2413,14 @@ yyreduce:
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 685 "parser.y"
+#line 690 "parser.y"
     { (yyval.node) = (yyvsp[(2) - (3)].node); ;}
     break;
 
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 686 "parser.y"
+#line 691 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (1)].sval), escopo_atual);
           if (idx == -1) {
@@ -2435,14 +2440,14 @@ yyreduce:
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 700 "parser.y"
+#line 705 "parser.y"
     { temp_args_count = 0; ;}
     break;
 
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 700 "parser.y"
+#line 705 "parser.y"
     {
           /* CHAMADA DE FUNÇÃO DENTRO DE EXPRESSÃO - retorno é usado */
           int idx = busca((yyvsp[(1) - (5)].sval), escopo_atual);
@@ -2478,7 +2483,7 @@ yyreduce:
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 730 "parser.y"
+#line 735 "parser.y"
     {
           int idx = busca((yyvsp[(1) - (4)].sval), escopo_atual);
           if (idx == -1) {
@@ -2490,7 +2495,9 @@ yyreduce:
           }
           
           TreeNode* idNode = createNode(NODE_ID);
-          idNode->name = strdup((yyvsp[(1) - (4)].sval));
+          char* arrayName = (char*)malloc(strlen((yyvsp[(1) - (4)].sval)) + 3);
+          sprintf(arrayName, "%s[]", (yyvsp[(1) - (4)].sval));
+          idNode->name = arrayName;
           // Adiciona o índice como filho do ID
           addChild(idNode, (yyvsp[(3) - (4)].node));
           (yyval.node) = idNode;
@@ -2502,7 +2509,7 @@ yyreduce:
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 748 "parser.y"
+#line 755 "parser.y"
     {
         TreeNode* constNode = createNode(NODE_CONST);
         constNode->value = (yyvsp[(1) - (1)].ival);
@@ -2513,7 +2520,7 @@ yyreduce:
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 753 "parser.y"
+#line 760 "parser.y"
     {
         TreeNode* inputNode = createNode(NODE_INPUT);
         (yyval.node) = inputNode;
@@ -2523,21 +2530,21 @@ yyreduce:
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 760 "parser.y"
+#line 767 "parser.y"
     { (yyval.param_count) = (yyvsp[(1) - (1)].param_count); ;}
     break;
 
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 761 "parser.y"
+#line 768 "parser.y"
     { (yyval.param_count) = 0; ;}
     break;
 
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 765 "parser.y"
+#line 772 "parser.y"
     { 
         (yyval.param_count) = (yyvsp[(1) - (3)].param_count) + 1; 
         temp_args[temp_args_count++] = (yyvsp[(3) - (3)].node);
@@ -2547,7 +2554,7 @@ yyreduce:
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 769 "parser.y"
+#line 776 "parser.y"
     { 
         (yyval.param_count) = 1; 
         temp_args[temp_args_count++] = (yyvsp[(1) - (1)].node);
@@ -2557,7 +2564,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 2561 "parser.tab.c"
+#line 2568 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2776,7 +2783,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 775 "parser.y"
+#line 782 "parser.y"
 
 
 void yyerror(const char *s) {
