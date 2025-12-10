@@ -1,6 +1,7 @@
 Stmt: Prog
 ----Exp: Type: int
 --------Stmt: Var: Id: vet
+------------Exp: Const: 10
 --------Exp: Type: int
 ------------Stmt: Func: minloc
 ----------------Exp: Type: int

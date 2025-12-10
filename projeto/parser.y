@@ -233,7 +233,7 @@ void imprimir_tabela_simbolos(FILE* arquivo) {
 %type <node> compound_stmt statement_list statement expression_stmt selection_stmt
 %type <node> iteration_stmt return_stmt io_stmt call_stmt
 %type <node> expression simple_expression additive_expression term factor
-%type <node> local_declarations param addop mulop
+%type <node> local_declarations param addop mulop array_spec
 %type <param_count> params param_list args arg_list
 
 %%
@@ -253,11 +253,17 @@ program:
 
 declaration_list:
       declaration_list declaration {
-        $$ = $1;
+        if ($1 == NULL) {
+            $$ = createNode(NODE_PROG);
+        } else {
+            $$ = $1;
+        }
         addChild($$, $2);
       }
     | declaration {
-        $$ = $1;
+        TreeNode* listNode = createNode(NODE_PROG);
+        addChild(listNode, $1);
+        $$ = listNode;
       }
     ;
 
@@ -284,6 +290,12 @@ var_declaration:
         typeNode->name = strdup($1);
         TreeNode* varNode = createNode(NODE_VAR);
         varNode->name = strdup($2);
+        
+        // Se for array, adiciona o tamanho como filho do nó VAR
+        if ($3 != NULL) {
+            addChild(varNode, $3);
+        }
+        
         addChild(typeNode, varNode);
         $$ = typeNode;
         
@@ -292,8 +304,12 @@ var_declaration:
     ;
 
 array_spec:
-      /* vazio */
-    | LBRACKET NUM RBRACKET
+      /* vazio */ { $$ = NULL; }
+    | LBRACKET NUM RBRACKET {
+        TreeNode* sizeNode = createNode(NODE_CONST);
+        sizeNode->value = $2;
+        $$ = sizeNode;
+      }
     ;
 
 fun_declaration:
