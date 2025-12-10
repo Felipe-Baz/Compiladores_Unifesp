@@ -2114,13 +2114,13 @@ yyreduce:
           TreeNode* callNode = createNode(NODE_CALL);
           TreeNode* idNode = createNode(NODE_ID);
           idNode->name = strdup((yyvsp[(1) - (6)].sval));
-          addChild(callNode, idNode);
           
-          // Adiciona os argumentos ao nó da chamada
+          // Adiciona os argumentos como filhos do ID da função
           for (int i = 0; i < temp_args_count; i++) {
-              addChild(callNode, temp_args[i]);
+              addChild(idNode, temp_args[i]);
           }
           
+          addChild(callNode, idNode);
           (yyval.node) = callNode;
           temp_args_count = 0;
           
@@ -2431,13 +2431,13 @@ yyreduce:
           TreeNode* callNode = createNode(NODE_CALL);
           TreeNode* idNode = createNode(NODE_ID);
           idNode->name = strdup((yyvsp[(1) - (5)].sval));
-          addChild(callNode, idNode);
           
-          // Adiciona os argumentos ao nó da chamada
+          // Adiciona os argumentos como filhos do ID da função
           for (int i = 0; i < temp_args_count; i++) {
-              addChild(callNode, temp_args[i]);
+              addChild(idNode, temp_args[i]);
           }
           
+          addChild(callNode, idNode);
           (yyval.node) = callNode;
           temp_args_count = 0;
           

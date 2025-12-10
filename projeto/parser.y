@@ -491,13 +491,13 @@ call_stmt:
           TreeNode* callNode = createNode(NODE_CALL);
           TreeNode* idNode = createNode(NODE_ID);
           idNode->name = strdup($1);
-          addChild(callNode, idNode);
           
-          // Adiciona os argumentos ao nó da chamada
+          // Adiciona os argumentos como filhos do ID da função
           for (int i = 0; i < temp_args_count; i++) {
-              addChild(callNode, temp_args[i]);
+              addChild(idNode, temp_args[i]);
           }
           
+          addChild(callNode, idNode);
           $$ = callNode;
           temp_args_count = 0;
           
@@ -699,13 +699,13 @@ factor:
           TreeNode* callNode = createNode(NODE_CALL);
           TreeNode* idNode = createNode(NODE_ID);
           idNode->name = strdup($1);
-          addChild(callNode, idNode);
           
-          // Adiciona os argumentos ao nó da chamada
+          // Adiciona os argumentos como filhos do ID da função
           for (int i = 0; i < temp_args_count; i++) {
-              addChild(callNode, temp_args[i]);
+              addChild(idNode, temp_args[i]);
           }
           
+          addChild(callNode, idNode);
           $$ = callNode;
           temp_args_count = 0;
           
