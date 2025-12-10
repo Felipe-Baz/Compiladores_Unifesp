@@ -1,13 +1,13 @@
 Stmt: Prog
 ----Exp: Type: int
---------Stmt: Var: a
+--------Stmt: Var: Id: a
 --------Exp: Type: int
 ------------Stmt: Func: x
 ----------------Stmt: Prog
 --------------------Stmt: Return: int
 ------------------------Exp: Const: 1
 --------Exp: Type: int
-------------Stmt: Var: x
+------------Stmt: Var: Id: x
 --------Exp: Type: void
 ------------Stmt: Func: t1
 ----------------Stmt: Prog
@@ -18,19 +18,19 @@ Stmt: Prog
 ------------Stmt: Func: t2
 ----------------Stmt: Prog
 --------------------Exp: Type: void
-------------------------Stmt: Var: z
+------------------------Stmt: Var: Id: z
 --------Exp: Type: void
 ------------Stmt: Func: t3
 ----------------Stmt: Prog
 --------------------Exp: Type: int
-------------------------Stmt: Var: k
+------------------------Stmt: Var: Id: k
 --------------------Exp: Type: int
-------------------------Stmt: Var: k
+------------------------Stmt: Var: Id: k
 --------Exp: Type: void
 ------------Stmt: Func: t4
 ----------------Stmt: Prog
 --------------------Exp: Type: int
-------------------------Stmt: Var: v
+------------------------Stmt: Var: Id: v
 --------------------Stmt: Assign
 ------------------------Exp: Id: v
 ------------------------Stmt: Call
@@ -38,9 +38,9 @@ Stmt: Prog
 --------Exp: Type: void
 ------------Stmt: Func: soma2
 ----------------Exp: Type: int
---------------------Stmt: Var: a
+--------------------Stmt: Var: Id: a
 ----------------Exp: Type: int
---------------------Stmt: Var: b
+--------------------Stmt: Var: Id: b
 ----------------Stmt: Prog
 --------Exp: Type: void
 ------------Stmt: Func: t5
@@ -51,17 +51,17 @@ Stmt: Prog
 --------Exp: Type: void
 ------------Stmt: Func: soma3
 ----------------Exp: Type: int
---------------------Stmt: Var: a
+--------------------Stmt: Var: Id: a
 ----------------Exp: Type: void
---------------------Stmt: Var: b
+--------------------Stmt: Var: Id: b
 ----------------Stmt: Prog
 --------Exp: Type: void
 ------------Stmt: Func: t6
 ----------------Stmt: Prog
 --------------------Exp: Type: int
-------------------------Stmt: Var: m
+------------------------Stmt: Var: Id: m
 --------------------Exp: Type: int
-------------------------Stmt: Var: n
+------------------------Stmt: Var: Id: n
 --------------------Stmt: Call
 ------------------------Exp: Id: soma3
 ------------------------Exp: Id: m
@@ -77,7 +77,7 @@ Stmt: Prog
 ------------------------Exp: Const: 1
 ------------------------Stmt: Prog
 ----------------------------Exp: Type: int
---------------------------------Stmt: Var: p
+--------------------------------Stmt: Var: Id: p
 ----------------------------Stmt: Assign
 --------------------------------Exp: Id: p
 --------------------------------Exp: Const: 10
@@ -88,7 +88,7 @@ Stmt: Prog
 ------------Stmt: Func: t9
 ----------------Stmt: Prog
 --------------------Exp: Type: int
-------------------------Stmt: Var: r
+------------------------Stmt: Var: Id: r
 --------------------Stmt: Assign
 ------------------------Exp: Id: r
 ------------------------Stmt: Call
@@ -102,4 +102,4 @@ Stmt: Prog
 ------------Stmt: Func: main
 ----------------Stmt: Prog
 --------Exp: Type: int
-------------Stmt: Var: main
+------------Stmt: Var: Id: main

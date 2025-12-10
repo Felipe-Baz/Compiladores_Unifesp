@@ -96,7 +96,7 @@ void printAST(TreeNode* node, int depth) {
             break;
         case NODE_VAR:
             if (node->name != NULL) {
-                fprintf(out, "Stmt: Var: %s\n", node->name);
+                fprintf(out, "Stmt: Var: Id: %s\n", node->name);
             } else {
                 fprintf(out, "Stmt: Var\n");
             }
