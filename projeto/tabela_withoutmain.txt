@@ -1,9 +1,0 @@
-=== TABELA DE SIMBOLOS ===
-
-Nome                 Tipo       Linha      Escopo          Parametros
---------------------------------------------------------------------------------
-gcd                  int        4          global          2         
-u                    int        4          gcd             0         
-v                    int        4          gcd             0         
-
-Total de simbolos: 3
