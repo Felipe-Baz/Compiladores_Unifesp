@@ -3,6 +3,8 @@
 
 
 func gcd:
+  var int u
+  var int v
   t0 = v == 0
   ifFalse t0 goto L0
   return u

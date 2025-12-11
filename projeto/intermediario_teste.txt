@@ -1,27 +1,35 @@
 # Intermediate Code (Three-Address Code)
 # Generated from AST
 
+  var int a
 
 func x:
   return 1
 endfunc
+  var int x
 
 func t1:
   y = 10
 endfunc
 
 func t2:
+  var void z
 endfunc
 
 func t3:
+  var int k
+  var int k
 endfunc
 
 func t4:
+  var int v
   t0 = call funcaoInexistente, 0
   v = t0
 endfunc
 
 func soma2:
+  var int a
+  var int b
 endfunc
 
 func t5:
@@ -30,9 +38,13 @@ func t5:
 endfunc
 
 func soma3:
+  var int a
+  var void b
 endfunc
 
 func t6:
+  var int m
+  var int n
   param m
   param n
   call soma3, 2
@@ -44,12 +56,14 @@ endfunc
 
 func t8:
   ifFalse 1 goto L0
+  var int p
   p = 10
 L0:
   p = 20
 endfunc
 
 func t9:
+  var int r
   t1 = call t2, 0
   r = t1
 endfunc
@@ -59,3 +73,4 @@ endfunc
 
 func main:
 endfunc
+  var int main
