@@ -167,6 +167,22 @@ char* generateOp(TreeNode* node) {
     
     if (!left || !right) return NULL;
     
+    // Check if left or right are array accesses and need temporaries
+    char* leftVar = left;
+    char* rightVar = right;
+    
+    if (strchr(left, '[') != NULL) {
+        char* temp = newTemp();
+        fprintf(output, "  %s = %s\n", temp, left);
+        leftVar = temp;
+    }
+    
+    if (strchr(right, '[') != NULL) {
+        char* temp = newTemp();
+        fprintf(output, "  %s = %s\n", temp, right);
+        rightVar = temp;
+    }
+    
     char* result = newTemp();
     char op_symbol[10] = "";
     
@@ -181,7 +197,10 @@ char* generateOp(TreeNode* node) {
     else if (strcmp(node->op, "==") == 0) strcpy(op_symbol, "==");
     else if (strcmp(node->op, "!=") == 0) strcpy(op_symbol, "!=");
     
-    fprintf(output, "  %s = %s %s %s\n", result, left, op_symbol, right);
+    fprintf(output, "  %s = %s %s %s\n", result, leftVar, op_symbol, rightVar);
+    
+    if (leftVar != left) free(leftVar);
+    if (rightVar != right) free(rightVar);
     free(left);
     free(right);
     return result;
@@ -197,6 +216,29 @@ char* generateExpression(TreeNode* node) {
             return temp;
         }
         case NODE_ID: {
+            // Check if this is an array access
+            if (strstr(node->name, "[]") != NULL) {
+                if (node->child_count > 0) {
+                    // Array with index
+                    char* index = generateExpression(node->children[0]);
+                    char* result = (char*)malloc(256);
+                    // Remove [] from name
+                    char arrayName[256];
+                    strcpy(arrayName, node->name);
+                    char* bracket = strstr(arrayName, "[]");
+                    if (bracket) *bracket = '\0';
+                    sprintf(result, "%s[%s]", arrayName, index);
+                    free(index);
+                    return result;
+                } else {
+                    // Array without index (parameter passing)
+                    char* result = (char*)malloc(256);
+                    strcpy(result, node->name);
+                    char* bracket = strstr(result, "[]");
+                    if (bracket) *bracket = '\0';
+                    return result;
+                }
+            }
             return strdup(node->name);
         }
         case NODE_OP: {
@@ -238,9 +280,30 @@ void generateAssign(TreeNode* node) {
     char* rhsValue = generateExpression(rhs);
     if (!rhsValue) return;
     
-    if (lhs->kind == NODE_ID) {
-        fprintf(output, "  %s = %s\n", lhs->name, rhsValue);
+    // If rhs is an array access, use a temporary
+    char* rhsVar = rhsValue;
+    if (strchr(rhsValue, '[') != NULL) {
+        char* temp = newTemp();
+        fprintf(output, "  %s = %s\n", temp, rhsValue);
+        rhsVar = temp;
     }
+    
+    if (lhs->kind == NODE_ID) {
+        // Check if left side is an array access
+        if (strstr(lhs->name, "[]") != NULL && lhs->child_count > 0) {
+            char* index = generateExpression(lhs->children[0]);
+            char arrayName[256];
+            strcpy(arrayName, lhs->name);
+            char* bracket = strstr(arrayName, "[]");
+            if (bracket) *bracket = '\0';
+            fprintf(output, "  %s[%s] = %s\n", arrayName, index, rhsVar);
+            free(index);
+        } else {
+            fprintf(output, "  %s = %s\n", lhs->name, rhsVar);
+        }
+    }
+    
+    if (rhsVar != rhsValue) free(rhsVar);
     free(rhsValue);
 }
 
@@ -361,16 +424,8 @@ void generateStatement(TreeNode* node) {
                         generateStatement(child->children[i]);
                     }
                     fprintf(output, "endfunc\n");
-                } else if (child->kind == NODE_VAR) {
-                    // Variable declaration
-                    if (child->child_count > 0 && child->children[0]->kind == NODE_CONST) {
-                        // Array declaration
-                        fprintf(output, "  var %s %s[%d]\n", node->name, child->name, child->children[0]->value);
-                    } else {
-                        // Simple variable declaration
-                        fprintf(output, "  var %s %s\n", node->name, child->name);
-                    }
                 }
+                // Variable declarations are skipped in three-address code
             }
             break;
         default:
