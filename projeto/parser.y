@@ -233,7 +233,7 @@ void imprimir_tabela_simbolos(FILE* arquivo) {
 %type <node> compound_stmt statement_list statement expression_stmt selection_stmt
 %type <node> iteration_stmt return_stmt io_stmt call_stmt
 %type <node> expression simple_expression additive_expression term factor
-%type <node> local_declarations param addop mulop array_spec
+%type <node> local_declarations param addop mulop array_spec relop
 %type <param_count> params param_list args arg_list
 
 %%
@@ -629,17 +629,44 @@ expression:
 
 simple_expression:
       additive_expression relop additive_expression {
-        TreeNode* opNode = createNode(NODE_OP);
-        opNode->op = strdup("COMP");
-        addChild(opNode, $1);
-        addChild(opNode, $3);
-        $$ = opNode;
+        $$ = $2;
+        addChild($$, $1);
+        addChild($$, $3);
       }
     | additive_expression { $$ = $1; }
     ;
 
 relop:
-      LEQ | LT | GT | GEQ | EQ | NEQ
+      LEQ {
+        TreeNode* opNode = createNode(NODE_OP);
+        opNode->op = strdup("<=");
+        $$ = opNode;
+      }
+    | LT {
+        TreeNode* opNode = createNode(NODE_OP);
+        opNode->op = strdup("<");
+        $$ = opNode;
+      }
+    | GT {
+        TreeNode* opNode = createNode(NODE_OP);
+        opNode->op = strdup(">");
+        $$ = opNode;
+      }
+    | GEQ {
+        TreeNode* opNode = createNode(NODE_OP);
+        opNode->op = strdup(">=");
+        $$ = opNode;
+      }
+    | EQ {
+        TreeNode* opNode = createNode(NODE_OP);
+        opNode->op = strdup("==");
+        $$ = opNode;
+      }
+    | NEQ {
+        TreeNode* opNode = createNode(NODE_OP);
+        opNode->op = strdup("!=");
+        $$ = opNode;
+      }
     ;
 
 additive_expression:
