@@ -739,14 +739,13 @@ factor:
           free($1);
     }
     | ID LPAREN { temp_args_count = 0; } args RPAREN {
-          /* CHAMADA DE FUNÇÃO DENTRO DE EXPRESSÃO - retorno é usado */
+          /* Call func com retorno usado */
           int idx = busca($1, escopo_atual);
           if (idx == -1) {
               printf("Erro semantico: funcao '%s' nao declarada.\n", $1);
           } else if (strcmp(tabela[idx].tipo, "void") == 0) {
               printf("Erro semantico: variavel '%s' do tipo void nao pode ser usada em expressoes.\n", $1);
           } else {
-              // Verifica número de argumentos
               if (tabela[idx].param_counter != $4) {
                   printf("Erro semantico: funcao '%s' espera %d parametro(s), mas recebeu %d argumento(s).\n", 
                          $1, tabela[idx].param_counter, $4);
@@ -857,7 +856,6 @@ int main(int argc, char **argv) {
     }
 
     if (root != NULL) {
-        // Temporariamente redireciona out para o arquivo da AST
         out = astFile;
         printAST(root, 0);
         freeAST(root);

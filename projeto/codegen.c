@@ -84,10 +84,8 @@ void extractName(const char* line, char* name) {
         colon++;
         while (*colon == ' ') colon++;
         strcpy(name, colon);
-        // Remove newline
         char* nl = strchr(name, '\n');
         if (nl) *nl = '\0';
-        // Remove trailing whitespace
         int len = strlen(name);
         while (len > 0 && isspace(name[len-1])) {
             name[len-1] = '\0';
@@ -135,19 +133,16 @@ TreeNode* parseAST(FILE* file) {
             node->value = atoi(extracted);
         }
         
-        // Pop stack until we find the parent
         while (stack_top >= 0 && stack[stack_top]->depth >= depth) {
             stack_top--;
         }
         
         if (stack_top >= 0) {
-            // Add as child to parent
             TreeNode* parent = stack[stack_top];
             if (parent->child_count < MAX_CHILDREN) {
                 parent->children[parent->child_count++] = node;
             }
         } else {
-            // This is the root
             root = node;
         }
         
@@ -167,7 +162,6 @@ char* generateOp(TreeNode* node) {
     
     if (!left || !right) return NULL;
     
-    // Check if left or right are array accesses and need temporaries
     char* leftVar = left;
     char* rightVar = right;
     
@@ -216,13 +210,11 @@ char* generateExpression(TreeNode* node) {
             return temp;
         }
         case NODE_ID: {
-            // Check if this is an array access
             if (strstr(node->name, "[]") != NULL) {
                 if (node->child_count > 0) {
-                    // Array with index
                     char* index = generateExpression(node->children[0]);
                     char* result = (char*)malloc(256);
-                    // Remove [] from name
+                    
                     char arrayName[256];
                     strcpy(arrayName, node->name);
                     char* bracket = strstr(arrayName, "[]");
@@ -231,7 +223,6 @@ char* generateExpression(TreeNode* node) {
                     free(index);
                     return result;
                 } else {
-                    // Array without index (parameter passing)
                     char* result = (char*)malloc(256);
                     strcpy(result, node->name);
                     char* bracket = strstr(result, "[]");
@@ -254,7 +245,7 @@ char* generateExpression(TreeNode* node) {
             if (node->child_count > 0 && node->children[0]->kind == NODE_ID) {
                 TreeNode* funcId = node->children[0];
                 fprintf(output, "  ");
-                // Print arguments
+                
                 for (int i = 0; i < funcId->child_count; i++) {
                     char* arg = generateExpression(funcId->children[i]);
                     fprintf(output, "param %s\n  ", arg);
@@ -280,7 +271,6 @@ void generateAssign(TreeNode* node) {
     char* rhsValue = generateExpression(rhs);
     if (!rhsValue) return;
     
-    // If rhs is an array access, use a temporary
     char* rhsVar = rhsValue;
     if (strchr(rhsValue, '[') != NULL) {
         char* temp = newTemp();
@@ -289,7 +279,6 @@ void generateAssign(TreeNode* node) {
     }
     
     if (lhs->kind == NODE_ID) {
-        // Check if left side is an array access
         if (strstr(lhs->name, "[]") != NULL && lhs->child_count > 0) {
             char* index = generateExpression(lhs->children[0]);
             char arrayName[256];
@@ -316,11 +305,9 @@ void generateIf(TreeNode* node) {
     
     fprintf(output, "  ifFalse %s goto %s\n", condition, labelFalse);
     
-    // Then branch
     generateStatement(node->children[1]);
     
     if (node->child_count > 2) {
-        // Has else branch
         fprintf(output, "  goto %s\n", labelEnd);
         fprintf(output, "%s:\n", labelFalse);
         generateStatement(node->children[2]);
@@ -344,7 +331,6 @@ void generateWhile(TreeNode* node) {
     char* condition = generateExpression(node->children[0]);
     fprintf(output, "  ifFalse %s goto %s\n", condition, labelEnd);
     
-    // Loop body
     generateStatement(node->children[1]);
     
     fprintf(output, "  goto %s\n", labelStart);
@@ -368,7 +354,6 @@ void generateOutput(TreeNode* node) {
     if (node->child_count > 0) {
         char* value = generateExpression(node->children[0]);
         
-        // If value is an array access, use a temporary
         char* outputVar = value;
         if (strchr(value, '[') != NULL) {
             char* temp = newTemp();
@@ -387,7 +372,7 @@ void generateCall(TreeNode* node) {
     if (node->child_count > 0 && node->children[0]->kind == NODE_ID) {
         TreeNode* funcId = node->children[0];
         fprintf(output, "  ");
-        // Print arguments
+
         for (int i = 0; i < funcId->child_count; i++) {
             char* arg = generateExpression(funcId->children[i]);
             fprintf(output, "param %s\n  ", arg);
@@ -425,18 +410,16 @@ void generateStatement(TreeNode* node) {
             generateCall(node);
             break;
         case NODE_TYPE:
-            // Process function or variable declaration
             if (node->child_count > 0) {
                 TreeNode* child = node->children[0];
                 if (child->kind == NODE_FUNC) {
                     fprintf(output, "\nfunc %s:\n", child->name);
-                    // Process function body
+                    
                     for (int i = 0; i < child->child_count; i++) {
                         generateStatement(child->children[i]);
                     }
                     fprintf(output, "endfunc\n");
                 }
-                // Variable declarations are skipped in three-address code
             }
             break;
         default:
