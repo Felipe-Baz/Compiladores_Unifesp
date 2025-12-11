@@ -73,12 +73,13 @@ L7:
 L8:
   t16 = i < 10
   ifFalse t16 goto L9
-  output vet[i]
-  t17 = i + 1
-  i = t17
+  t17 = vet[i]
+  output t17
+  t18 = i + 1
+  i = t18
   goto L8
 L9:
-  t18 = call xyz, 0
-  i = t18
+  t19 = call xyz, 0
+  i = t19
   call xyv, 0
 endfunc

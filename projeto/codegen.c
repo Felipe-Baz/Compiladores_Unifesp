@@ -367,7 +367,18 @@ void generateReturn(TreeNode* node) {
 void generateOutput(TreeNode* node) {
     if (node->child_count > 0) {
         char* value = generateExpression(node->children[0]);
-        fprintf(output, "  output %s\n", value);
+        
+        // If value is an array access, use a temporary
+        char* outputVar = value;
+        if (strchr(value, '[') != NULL) {
+            char* temp = newTemp();
+            fprintf(output, "  %s = %s\n", temp, value);
+            outputVar = temp;
+        }
+        
+        fprintf(output, "  output %s\n", outputVar);
+        
+        if (outputVar != value) free(outputVar);
         free(value);
     }
 }
