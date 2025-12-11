@@ -1,0 +1,105 @@
+Stmt: Prog
+----Exp: Type: int
+--------Stmt: Var: Id: a
+----Exp: Type: int
+--------Stmt: Func: x
+------------Stmt: Prog
+----------------Stmt: Return: int
+--------------------Exp: Const: 1
+----Exp: Type: int
+--------Stmt: Var: Id: x
+----Exp: Type: void
+--------Stmt: Func: t1
+------------Stmt: Prog
+----------------Stmt: Assign
+--------------------Exp: Id: y
+--------------------Exp: Const: 10
+----Exp: Type: void
+--------Stmt: Func: t2
+------------Stmt: Prog
+----------------Exp: Type: void
+--------------------Stmt: Var: Id: z
+----Exp: Type: void
+--------Stmt: Func: t3
+------------Stmt: Prog
+----------------Exp: Type: int
+--------------------Stmt: Var: Id: k
+----------------Exp: Type: int
+--------------------Stmt: Var: Id: k
+----Exp: Type: void
+--------Stmt: Func: t4
+------------Stmt: Prog
+----------------Exp: Type: int
+--------------------Stmt: Var: Id: v
+----------------Stmt: Assign
+--------------------Exp: Id: v
+--------------------Stmt: Call
+------------------------Exp: Id: funcaoInexistente
+----Exp: Type: void
+--------Stmt: Func: soma2
+------------Exp: Type: int
+----------------Stmt: Var: Id: a
+------------Exp: Type: int
+----------------Stmt: Var: Id: b
+------------Stmt: Prog
+----Exp: Type: void
+--------Stmt: Func: t5
+------------Stmt: Prog
+----------------Stmt: Call
+--------------------Exp: Id: soma2
+------------------------Exp: Const: 10
+----Exp: Type: void
+--------Stmt: Func: soma3
+------------Exp: Type: int
+----------------Stmt: Var: Id: a
+------------Exp: Type: void
+----------------Stmt: Var: Id: b
+------------Stmt: Prog
+----Exp: Type: void
+--------Stmt: Func: t6
+------------Stmt: Prog
+----------------Exp: Type: int
+--------------------Stmt: Var: Id: m
+----------------Exp: Type: int
+--------------------Stmt: Var: Id: n
+----------------Stmt: Call
+--------------------Exp: Id: soma3
+------------------------Exp: Id: m
+------------------------Exp: Id: n
+----Exp: Type: int
+--------Stmt: Func: t7
+------------Stmt: Prog
+----------------Stmt: Return: void
+----Exp: Type: void
+--------Stmt: Func: t8
+------------Stmt: Prog
+----------------Stmt: If
+--------------------Exp: Const: 1
+--------------------Stmt: Prog
+------------------------Exp: Type: int
+----------------------------Stmt: Var: Id: p
+------------------------Stmt: Assign
+----------------------------Exp: Id: p
+----------------------------Exp: Const: 10
+----------------Stmt: Assign
+--------------------Exp: Id: p
+--------------------Exp: Const: 20
+----Exp: Type: void
+--------Stmt: Func: t9
+------------Stmt: Prog
+----------------Exp: Type: int
+--------------------Stmt: Var: Id: r
+----------------Stmt: Assign
+--------------------Exp: Id: r
+--------------------Stmt: Call
+------------------------Exp: Id: t2
+----Exp: Type: void
+--------Stmt: Func: t10
+------------Stmt: Prog
+----------------Exp: Id: break
+----------------Exp: Id: continue
+----Exp: Type: void
+--------Stmt: Func: main
+------------Stmt: Prog
+----Exp: Type: int
+--------Stmt: Var: Id: main
