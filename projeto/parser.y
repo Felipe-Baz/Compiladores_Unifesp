@@ -18,8 +18,9 @@ typedef struct {
 
 Simbolo tabela[100];
 int n_simbolos = 0;
-char* escopo_atual = "global";
+char* escopo_atual = NULL;
 int has_return = 0;
+int escopo_is_global_literal = 1;  // Flag para indicar se escopo_atual é string literal
 
 // Estrutura para a AST
 typedef enum {
@@ -321,10 +322,11 @@ fun_declaration:
                 insere($2, $1, @2.first_line, escopo_atual, 0);
             }
 
-            if (strcmp(escopo_atual, "global") != 0) {
+            if (!escopo_is_global_literal) {
                 free(escopo_atual);
             }
             escopo_atual = strdup($2);
+            escopo_is_global_literal = 0;
             temp_params_count = 0;  // Reset da lista de parâmetros
       } 
       params {
@@ -356,10 +358,11 @@ fun_declaration:
             addChild(funcNode, $8);
             $$ = typeNode;
 
-            if (strcmp(escopo_atual, "global") != 0) {
+            if (!escopo_is_global_literal) {
                 free(escopo_atual);
             }
             escopo_atual = "global";
+            escopo_is_global_literal = 1;
             has_return = 0;
             temp_params_count = 0;  // Limpa a lista de parâmetros
       }
@@ -436,6 +439,9 @@ compound_stmt:
             for (int i = 0; i < $2->child_count; i++) {
                 addChild(compoundNode, $2->children[i]);
             }
+            // Libera apenas o container, não os filhos (foram transferidos)
+            free($2->children);
+            free($2);
         }
         
         // Adiciona todos os statements
@@ -443,6 +449,9 @@ compound_stmt:
             for (int i = 0; i < $3->child_count; i++) {
                 addChild(compoundNode, $3->children[i]);
             }
+            // Libera apenas o container, não os filhos (foram transferidos)
+            free($3->children);
+            free($3);
         }
         
         $$ = compoundNode;
@@ -818,6 +827,10 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    // Inicializa escopo_atual
+    escopo_atual = "global";
+    escopo_is_global_literal = 1;
+
     yyin = fopen(argv[1], "r");
     if (!yyin) {
         perror("Erro ao abrir arquivo de entrada");
@@ -864,7 +877,8 @@ int main(int argc, char **argv) {
     fclose(tabelaFile);
 
     liberar_tabela();
-    if (strcmp(escopo_atual, "global") != 0) {
+    // Libera escopo_atual se foi alocado dinamicamente
+    if (!escopo_is_global_literal) {
         free(escopo_atual);
     }
 

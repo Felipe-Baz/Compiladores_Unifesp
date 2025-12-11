@@ -182,6 +182,8 @@ char* generateOp(TreeNode* node) {
     else if (strcmp(node->op, "!=") == 0) strcpy(op_symbol, "!=");
     
     fprintf(output, "  %s = %s %s %s\n", result, left, op_symbol, right);
+    free(left);
+    free(right);
     return result;
 }
 
@@ -214,6 +216,7 @@ char* generateExpression(TreeNode* node) {
                 for (int i = 0; i < funcId->child_count; i++) {
                     char* arg = generateExpression(funcId->children[i]);
                     fprintf(output, "param %s\n  ", arg);
+                    free(arg);
                 }
                 fprintf(output, "%s = call %s, %d\n", temp, funcId->name, funcId->child_count);
             }
@@ -238,6 +241,7 @@ void generateAssign(TreeNode* node) {
     if (lhs->kind == NODE_ID) {
         fprintf(output, "  %s = %s\n", lhs->name, rhsValue);
     }
+    free(rhsValue);
 }
 
 void generateIf(TreeNode* node) {
@@ -258,9 +262,12 @@ void generateIf(TreeNode* node) {
         fprintf(output, "%s:\n", labelFalse);
         generateStatement(node->children[2]);
         fprintf(output, "%s:\n", labelEnd);
+        free(labelEnd);
     } else {
         fprintf(output, "%s:\n", labelFalse);
     }
+    free(condition);
+    free(labelFalse);
 }
 
 void generateWhile(TreeNode* node) {
@@ -279,12 +286,16 @@ void generateWhile(TreeNode* node) {
     
     fprintf(output, "  goto %s\n", labelStart);
     fprintf(output, "%s:\n", labelEnd);
+    free(condition);
+    free(labelStart);
+    free(labelEnd);
 }
 
 void generateReturn(TreeNode* node) {
     if (node->child_count > 0) {
         char* retValue = generateExpression(node->children[0]);
         fprintf(output, "  return %s\n", retValue);
+        free(retValue);
     } else {
         fprintf(output, "  return\n");
     }
@@ -294,6 +305,7 @@ void generateOutput(TreeNode* node) {
     if (node->child_count > 0) {
         char* value = generateExpression(node->children[0]);
         fprintf(output, "  output %s\n", value);
+        free(value);
     }
 }
 
@@ -305,6 +317,7 @@ void generateCall(TreeNode* node) {
         for (int i = 0; i < funcId->child_count; i++) {
             char* arg = generateExpression(funcId->children[i]);
             fprintf(output, "param %s\n  ", arg);
+            free(arg);
         }
         fprintf(output, "call %s, %d\n", funcId->name, funcId->child_count);
     }
